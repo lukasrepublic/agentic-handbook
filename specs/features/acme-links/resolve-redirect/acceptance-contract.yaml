@@ -1,0 +1,67 @@
+# Acceptance contract — sibling of feat-handbook-acme-links-resolve-redirect.md. Production-grade (post-audit).
+# AC-RESOLVE-1 is the MONEY-SHOT checkpoint: pre-change → RED on the 200-stub (and on a wrong-target redirect), GREEN on the real lookup.
+spec_ref: specs/features/acme-links/resolve-redirect/feat-handbook-acme-links-resolve-redirect.md
+spec_sha256: "0000000000000000000000000000000000000000000000000000000000000000"  # /foundry:authorize fills this
+scope:
+  allowed_paths:
+    - "src/app/r/**"
+    - "src/lib/links/**"
+    - "src/db/**"
+  denied_paths:
+    - "src/app/(auth)/**"
+    - "src/app/api/links/**"
+    - "src/design-system/**"
+checkpoints:
+  - ac_id: AC-RESOLVE-1
+    surface: "api:/r/:slug"
+    locator: "GET /r/<seeded canary slug> → HTTP 302 with Location EXACTLY equal to the seeded target https://example.com/acme-canary-9f3"
+    expect:
+      op: matches
+      value: 'https://example\.com/acme-canary-9f3'
+      baseline: pre-change
+  - ac_id: AC-RESOLVE-2
+    surface: "test:resolve-redirect"
+    locator: "a seeded link whose stored target is non-http(s) → 404 (read-side scheme guard); no dangerous-scheme Location emitted"
+    expect:
+      op: equals
+      value: "404"
+      baseline: none
+  - ac_id: AC-RESOLVE-3
+    surface: "test:resolve-redirect"
+    locator: "100 concurrent successful resolves → stored click count == 100 (atomic increment, no lost updates)"
+    expect:
+      op: count_gte
+      value: 100
+      baseline: none
+  - ac_id: AC-RESOLVE-4
+    surface: "api:/r/:slug"
+    locator: "GET /r/<unknown slug> → HTTP 404"
+    expect:
+      op: equals
+      value: "404"
+      baseline: none
+  - ac_id: AC-RESOLVE-5
+    surface: "api:/r/:slug"
+    locator: "GET /r/<path-traversal or oversized slug> → HTTP 404 with no 500 / DB-error leak"
+    expect:
+      op: equals
+      value: "404"
+      baseline: none
+  - ac_id: AC-RESOLVE-6
+    surface: "api:/r/:slug"
+    locator: "the 302 response carries Cache-Control: no-store (no poisoned-redirect caching)"
+    expect:
+      op: matches
+      value: 'no-store'
+      baseline: none
+target_repo: app        # the acme-links code repo (repos.app in the workspace manifest)
+# === FOUNDRY-AUTHORIZED-TRAILER (excluded from contract_sha256) ===
+authorized:
+  operator_id: op_lukas
+  authorized_at: 2026-07-31T17:04:54Z
+  auth_seq: 2
+  supersedes: 9e8c1976f9518f2007c5a73e836c0413be470a2f09cbbc8b82a8732cb2e46943
+  spec_sha256: 1549ec319ca886f5238d574e0ca30bf932499ef87710d7af547e2d0ece6bc419
+  contract_sha256: 5d9788dd9644599cd08ef85347da72391c805c79eba699b03f2d5eb6c247a5ba
+  merge_autonomy_mode: regular
+  reauth_after_impl: true

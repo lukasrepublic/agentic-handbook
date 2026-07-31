@@ -1,0 +1,75 @@
+# Acceptance contract — sibling of feat-handbook-acme-links-dashboard.md. Production-grade (post-audit).
+# AC-DASH-2 makes ownership isolation ATTRIBUTABLE: B's links visible in A's dashboard must be 0 (a no-WHERE leak → RED).
+spec_ref: specs/features/acme-links/dashboard/feat-handbook-acme-links-dashboard.md
+spec_sha256: "0000000000000000000000000000000000000000000000000000000000000000"  # /foundry:authorize fills this
+scope:
+  allowed_paths:
+    - "src/app/dashboard/**"
+    - "src/lib/links/**"
+    - "src/design-system/**"
+  denied_paths:
+    - "src/app/(auth)/**"
+    - "src/lib/auth/**"
+    - "src/app/r/**"
+    - "src/app/api/links/**"
+    - "src/middleware.ts"
+checkpoints:
+  - ac_id: AC-DASH-1
+    surface: "ui:/dashboard"
+    locator: "GET /dashboard {user A session} → 200 listing exactly A's links with click counts"
+    expect:
+      op: equals
+      value: "200"
+      baseline: pre-change
+  - ac_id: AC-DASH-2
+    surface: "test:dashboard"
+    locator: "two-user fixture (A,B): number of B's link slugs appearing in A's dashboard == 0 (cross-tenant leak → RED)"
+    expect:
+      op: equals
+      value: "0"
+      baseline: pre-change
+  - ac_id: AC-DASH-3
+    surface: "ui:/dashboard"
+    locator: "GET /dashboard {anonymous} → 307 to /login (Next App Router redirect); spoofed x-middleware-subrequest + no session still not served the dashboard"
+    expect:
+      op: equals
+      value: "307"
+      baseline: none
+  - ac_id: AC-DASH-4
+    surface: "ui:/dashboard"
+    locator: "GET /dashboard {user with 0 links} → 200 with the defined empty-state marker"
+    expect:
+      op: matches
+      value: 'empty-state'
+      baseline: none
+  - ac_id: AC-DASH-5
+    surface: "test:dashboard"
+    locator: "a link whose target contains <script> renders escaped (&lt;script&gt;) — inert, not executed (stored-XSS guard)"
+    expect:
+      op: matches
+      value: '&lt;script&gt;'
+      baseline: none
+  - ac_id: AC-DASH-6
+    surface: "ui:/dashboard"
+    locator: "dashboard markup is composed from design-system components/tokens (not ad-hoc markup)"
+    expect:
+      op: non-empty
+      baseline: none
+  - ac_id: AC-DASH-7
+    surface: "test:dashboard"
+    locator: "link listing is ordered newest-first and bounded (paginated / page-size limited)"
+    expect:
+      op: count_gte
+      value: 1
+      baseline: none
+target_repo: app        # the acme-links code repo (repos.app in the workspace manifest)
+# === FOUNDRY-AUTHORIZED-TRAILER (excluded from contract_sha256) ===
+authorized:
+  operator_id: op_lukas
+  authorized_at: 2026-07-31T17:04:54Z
+  auth_seq: 3
+  supersedes: 8327c082ddfd815bbe01359cb4f8ff935030383a669207b8ca9bd402c0c75e8b
+  spec_sha256: e93600e07de971481a61e6d355b96393e4470d69c69cbc9f3a95fcc598ba539d
+  contract_sha256: 23b9b889845fb94689dddbc719381f49c7501e89589d1d6edb1e271e6a4b25d9
+  merge_autonomy_mode: regular
+  reauth_after_impl: true

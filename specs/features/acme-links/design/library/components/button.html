@@ -1,0 +1,36 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Button — Acme Links</title>
+<link rel="stylesheet" href="../theme.css">
+</head>
+<body>
+  <div class="stack" style="gap:var(--space-5)">
+    <p class="help">Exactly one filled <code>btn-primary</code> per view; all other actions use <code>btn-secondary</code> or <code>btn-ghost</code>. The rows below are a catalog — shown together for reference, not for use in one view.</p>
+    <div class="row">
+      <button class="btn btn-primary">Create link</button>
+      <button class="btn btn-secondary">Cancel</button>
+      <button class="btn btn-ghost">Sign out</button>
+      <button class="btn btn-danger">Delete</button>
+    </div>
+    <div class="row">
+      <button class="btn btn-primary btn-sm">Small</button>
+      <button class="btn btn-primary">Medium</button>
+      <button class="btn btn-primary btn-lg">Large</button>
+      <button class="btn btn-primary" disabled>Disabled</button>
+    </div>
+    <p class="help">Loading / disabled across variants (the spinner uses <code>currentColor</code>, so it reads on each background):</p>
+    <div class="row">
+      <button class="btn btn-primary" aria-busy="true" aria-disabled="true" disabled>Shortening</button>
+      <button class="btn btn-secondary" aria-busy="true" aria-disabled="true" disabled>Saving</button>
+      <button class="btn btn-danger" aria-busy="true" aria-disabled="true" disabled>Deleting</button>
+    </div>
+    <div class="row">
+      <button class="btn btn-secondary" disabled>Disabled</button>
+      <button class="btn btn-danger" disabled>Disabled</button>
+    </div>
+    <!-- Busy actions announce progress via a polite live region (aria-busy alone is not announced) -->
+    <p class="help" role="status" aria-live="polite">Shortening link…</p>
+  </div>
+</body></html>

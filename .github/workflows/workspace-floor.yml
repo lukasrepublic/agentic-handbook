@@ -1,0 +1,55 @@
+# The workspace floor — the template's minimal CI (F0 from the 2026-07-31 first-run audit).
+#
+# Why this exists: the foundry plugin's git-discipline guard admits an in-session
+# `gh pr merge` only on live all-green checks, and a checkless repo FAIL-CLOSES — so a
+# fresh workspace could never merge its first PR from a Claude Code session. This job is
+# the honest fix: one small, real check (never a rubber stamp), and the seed the adopter
+# grows their own floor from.
+name: workspace-floor
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  workspace-floor:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Config files parse (operators registry, project config, settings)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, sys
+          for f in (".claude/foundry-operators.json", ".claude/foundry-project.json", ".claude/settings.json"):
+              try:
+                  d = json.load(open(f))
+              except FileNotFoundError:
+                  print(f"missing: {f}"); sys.exit(1)
+              except json.JSONDecodeError as e:
+                  print(f"invalid JSON: {f}: {e}"); sys.exit(1)
+          ops = json.load(open(".claude/foundry-operators.json")).get("operators", {})
+          if not ops:
+              print("operator registry has zero operators"); sys.exit(1)
+          print(f"config OK — {len(ops)} operator(s)")
+          PY
+      - name: Identity-guard selftest (shipped, hermetic)
+        run: bash .claude/hooks/gh-account-guard.selftest.sh
+      - name: Doc links resolve (relative links in tracked markdown)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, re, subprocess, sys
+          broken = []
+          files = subprocess.run(["git","ls-files","*.md"],capture_output=True,text=True).stdout.split()
+          for doc in files:
+              base = os.path.dirname(doc)
+              for _, target in re.findall(r"\[([^\]]+)\]\(([^)#\s]+)(?:#[^)]*)?\)", open(doc,encoding="utf-8").read()):
+                  if target.startswith(("http","mailto")): continue
+                  if not os.path.exists(os.path.normpath(os.path.join(base, target))):
+                      broken.append(f"{doc} -> {target}")
+          if broken:
+              print("broken links:\n" + "\n".join(broken)); sys.exit(1)
+          print(f"links OK across {len(files)} files")
+          PY

@@ -1,0 +1,50 @@
+<!-- @dsCard group="Colors" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colors — Acme Links</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+  .sw { display:flex; flex-direction:column; gap:var(--space-1); }
+  .chip { width:var(--swatch-w); height:var(--swatch-h); border-radius:var(--radius-md); border:var(--border-width) solid var(--color-border); }
+  .grid { display:flex; gap:var(--space-4); flex-wrap:wrap; }
+  .name { font-size:var(--text-xs); font-weight:var(--font-medium); }
+  .val { font-size:var(--text-xs); color:var(--color-text-muted); }
+  /* Section labels match the canary's .subhead role (text-xs / semibold) */
+  .subhead { font-size:var(--text-xs); font-weight:var(--font-semibold); text-transform:uppercase; letter-spacing:var(--tracking-wide); color:var(--color-text-muted); margin:var(--space-6) 0 var(--space-3); }
+</style></head>
+<body>
+  <div class="subhead">Primary (Indigo)</div>
+  <div class="grid">
+    <div class="sw"><div class="chip" style="background:var(--color-primary)"></div><span class="name">primary</span><span class="val">#4F46E5</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-primary-hover)"></div><span class="name">hover</span><span class="val">#4338CA</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-primary-active)"></div><span class="name">active</span><span class="val">#3730A3</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-primary-soft)"></div><span class="name">soft</span><span class="val">#EEF2FF</span></div>
+  </div>
+  <div class="subhead">Neutral (Slate)</div>
+  <div class="grid">
+    <div class="sw"><div class="chip" style="background:var(--color-slate-50)"></div><span class="name">50</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-slate-100)"></div><span class="name">100</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-slate-200)"></div><span class="name">200</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-slate-300)"></div><span class="name">300</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-slate-400)"></div><span class="name">400</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-slate-500)"></div><span class="name">500</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-slate-600)"></div><span class="name">600</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-slate-700)"></div><span class="name">700</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-slate-800)"></div><span class="name">800</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-slate-900)"></div><span class="name">900</span></div>
+  </div>
+  <div class="subhead">Semantic (fills)</div>
+  <p class="val" style="margin:0 0 var(--space-3)">Fill / large-graphic values. Never use a raw fill as body text — use the paired <code>-text</code> token below.</p>
+  <div class="grid">
+    <div class="sw"><div class="chip" style="background:var(--color-success)"></div><span class="name">success</span><span class="val">#059669</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-danger)"></div><span class="name">danger</span><span class="val">#DC2626</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-warning)"></div><span class="name">warning</span><span class="val">#D97706</span></div>
+  </div>
+  <div class="subhead">Semantic (AA-safe text)</div>
+  <div class="grid">
+    <div class="sw"><div class="chip" style="background:var(--color-success-soft)"></div><span class="name" style="color:var(--color-success-text)">success-text</span><span class="val">#065F46</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-danger-soft)"></div><span class="name" style="color:var(--color-danger-text)">danger-text</span><span class="val">#DC2626</span></div>
+    <div class="sw"><div class="chip" style="background:var(--color-warning-soft)"></div><span class="name" style="color:var(--color-warning-text)">warning-text</span><span class="val">#92400E</span></div>
+  </div>
+</body></html>

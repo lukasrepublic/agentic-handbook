@@ -1,0 +1,73 @@
+# Acceptance contract — sibling of feat-handbook-acme-links-create-link.md. Production-grade (post-audit).
+spec_ref: specs/features/acme-links/create-link/feat-handbook-acme-links-create-link.md
+spec_sha256: "0000000000000000000000000000000000000000000000000000000000000000"  # /foundry:authorize fills this
+scope:
+  allowed_paths:
+    - "src/app/api/links/**"
+    - "src/lib/links/**"
+    - "src/db/**"
+  denied_paths:
+    - "src/app/(auth)/**"
+    - "src/app/r/**"
+    - "src/design-system/**"
+checkpoints:
+  - ac_id: AC-CREATE-1
+    surface: "api:/api/links"
+    locator: "POST /api/links {authed, valid https url} → 201 with body {slug: 7-char base62, shortUrl: <BASE_URL>/r/<slug>}"
+    expect:
+      op: matches
+      value: '"slug":"[A-Za-z0-9]{7}"'
+      baseline: pre-change
+  - ac_id: AC-CREATE-2
+    surface: "api:/api/links"
+    locator: "POST /api/links {anonymous} → 401, no link created"
+    expect:
+      op: equals
+      value: "401"
+      baseline: none
+  - ac_id: AC-CREATE-3
+    surface: "api:/api/links"
+    locator: "POST /api/links {url: ' Javascript:...' / data: / file: / non-http(s) after normalization} → 400, no link created"
+    expect:
+      op: equals
+      value: "400"
+      baseline: none
+  - ac_id: AC-CREATE-4
+    surface: "api:/api/links"
+    locator: "POST /api/links {url length > 2048} → 400, no link created"
+    expect:
+      op: equals
+      value: "400"
+      baseline: none
+  - ac_id: AC-CREATE-5
+    surface: "test:create-link"
+    locator: "creating many links yields pairwise-distinct slugs (generation collision retried)"
+    expect:
+      op: count_gte
+      value: 100
+      baseline: none
+  - ac_id: AC-CREATE-6
+    surface: "test:create-link"
+    locator: "generated slugs match ^[A-Za-z0-9]{7}$ and are drawn from a CSPRNG (not sequential/predictable)"
+    expect:
+      op: matches
+      value: '^[A-Za-z0-9]{7}$'
+      baseline: none
+  - ac_id: AC-CREATE-7
+    surface: "test:create-link"
+    locator: "the same url submitted twice yields two links with distinct slugs (no dedup)"
+    expect:
+      op: count_gte
+      value: 2
+      baseline: none
+target_repo: app        # the acme-links code repo (repos.app in the workspace manifest)
+# === FOUNDRY-AUTHORIZED-TRAILER (excluded from contract_sha256) ===
+authorized:
+  operator_id: op_lukas
+  authorized_at: 2026-07-31T17:04:53Z
+  auth_seq: 2
+  supersedes: ad50d3d10d73c8073c735903d255c9215bf4016e3724ffba1f7cc46100cf1b20
+  spec_sha256: e55cc3bbb1ccbe1d9752065688dae1bd8ae40117d78aec88ebdbd7cc3b73a3a3
+  contract_sha256: c1407701bc125bc1c4df104a446cb9c43acebaefd63e3313754290fea85a86e3
+  merge_autonomy_mode: regular
+  reauth_after_impl: true

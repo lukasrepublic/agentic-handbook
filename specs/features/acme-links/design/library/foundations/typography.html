@@ -1,0 +1,24 @@
+<!-- @dsCard group="Type" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Typography — Acme Links</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+  /* Baseline .specimen shape matches the canary; --ruled adds the foundation's row rules
+     without redefining the shared baseline class. */
+  .specimen { display:flex; align-items:baseline; gap:var(--space-4); padding:var(--space-2) 0; }
+  .specimen--ruled { border-bottom:var(--border-width) solid var(--color-border); }
+  .tag { width:var(--width-spec-tag); font-size:var(--text-xs); color:var(--color-text-muted); font-family:ui-monospace,Menlo,monospace; }
+</style></head>
+<body>
+  <div class="specimen specimen--ruled"><span class="tag">4xl / 700</span><span style="font-size:var(--text-4xl);font-weight:var(--font-bold);line-height:var(--leading-display)">Your links</span></div>
+  <div class="specimen specimen--ruled"><span class="tag">3xl / 700</span><span style="font-size:var(--text-3xl);font-weight:var(--font-bold)">Recent links</span></div>
+  <div class="specimen specimen--ruled"><span class="tag">2xl / 600</span><span style="font-size:var(--text-2xl);font-weight:var(--font-semibold)">Dashboard</span></div>
+  <div class="specimen specimen--ruled"><span class="tag">xl / 600</span><span style="font-size:var(--text-xl);font-weight:var(--font-semibold);line-height:var(--leading-tight)">Recent links</span></div>
+  <div class="specimen specimen--ruled"><span class="tag">lg / 500</span><span style="font-size:var(--text-lg);font-weight:var(--font-medium);line-height:var(--leading-tight)">Create a short link</span></div>
+  <div class="specimen specimen--ruled"><span class="tag">base</span><span style="font-size:var(--text-base);line-height:var(--leading-normal)">Body — paste a long URL and get a short link.</span></div>
+  <div class="specimen specimen--ruled"><span class="tag">sm</span><span style="font-size:var(--text-sm)">Secondary text and form labels.</span></div>
+  <div class="specimen specimen--ruled"><span class="tag">xs / muted</span><span style="font-size:var(--text-xs);color:var(--color-text-muted)">Help text, timestamps, metadata.</span></div>
+  <p style="margin-top:var(--space-6);font-size:var(--text-xs);color:var(--color-text-muted)">Inter · system-ui fallback · scale 12 / 14 / 16 / 18 / 20 / 24 / 30 / 36</p>
+</body></html>

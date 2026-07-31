@@ -1,0 +1,65 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Table — Acme Links (link list)</title>
+<link rel="stylesheet" href="../theme.css">
+</head>
+<body>
+  <div class="stack" style="gap:var(--space-6)">
+
+    <!-- Default + hover. Sortable headers carry a real <button>; aria-sort lives on the th. -->
+    <div class="card" style="max-width:var(--width-table)">
+      <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th aria-sort="none"><button type="button">Short link</button></th><th>Destination</th><th aria-sort="descending"><button type="button">Clicks</button></th><th aria-sort="none"><button type="button">Created</button></th></tr></thead>
+        <tbody>
+          <tr><td class="mono">acme.example/r/k3Xt9Qa</td><td>https://anthropic.com/research</td><td><span class="badge">128</span></td><td>2d ago</td></tr>
+          <tr><td class="mono">acme.example/r/9fG2mLp</td><td>https://nextjs.org/docs/app</td><td><span class="badge">42</span></td><td>5d ago</td></tr>
+          <tr><td class="mono">acme.example/r/Zq7Bn4w</td><td>https://orm.drizzle.team</td><td><span class="badge">0</span></td><td>1w ago</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- Loading — skeleton rows. aria-busy alone is not announced, so pair a polite live region. -->
+    <div class="card" style="max-width:var(--width-table)">
+      <p class="help" role="status" aria-live="polite" style="padding:var(--space-3) var(--space-4) 0">Loading your links…</p>
+      <div class="table-wrap">
+      <table class="table" aria-busy="true">
+        <thead><tr><th aria-sort="none"><button type="button" disabled>Short link</button></th><th>Destination</th><th aria-sort="descending"><button type="button" disabled>Clicks</button></th><th aria-sort="none"><button type="button" disabled>Created</button></th></tr></thead>
+        <tbody>
+          <tr><td><span class="skeleton" style="width:60%"></span></td><td><span class="skeleton" style="width:80%"></span></td><td><span class="skeleton" style="width:var(--space-8)"></span></td><td><span class="skeleton" style="width:50%"></span></td></tr>
+          <tr><td><span class="skeleton" style="width:55%"></span></td><td><span class="skeleton" style="width:70%"></span></td><td><span class="skeleton" style="width:var(--space-8)"></span></td><td><span class="skeleton" style="width:45%"></span></td></tr>
+          <tr><td><span class="skeleton" style="width:65%"></span></td><td><span class="skeleton" style="width:75%"></span></td><td><span class="skeleton" style="width:var(--space-8)"></span></td><td><span class="skeleton" style="width:50%"></span></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- Empty — zero matching rows (in-table, after a filter/search) -->
+    <div class="card" style="max-width:var(--width-table)">
+      <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th aria-sort="none"><button type="button">Short link</button></th><th>Destination</th><th aria-sort="descending"><button type="button">Clicks</button></th><th aria-sort="none"><button type="button">Created</button></th></tr></thead>
+        <tbody>
+          <tr class="table-empty"><td colspan="4">No matching links.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- Error — failed to load. The message is an alert; sort headers are disabled (nothing to sort). -->
+    <div class="card" style="max-width:var(--width-table)">
+      <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th aria-sort="none"><button type="button" disabled>Short link</button></th><th>Destination</th><th aria-sort="descending"><button type="button" disabled>Clicks</button></th><th aria-sort="none"><button type="button" disabled>Created</button></th></tr></thead>
+        <tbody>
+          <tr class="table-error"><td colspan="4"><span class="help-error" role="alert">Couldn’t load your links.</span> <button class="btn btn-secondary btn-sm" type="button">Retry</button></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+  </div>
+</body></html>

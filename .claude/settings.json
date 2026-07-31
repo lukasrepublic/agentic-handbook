@@ -1,0 +1,15 @@
+{
+  "//": "Wire the Agentic Foundry factory into this workspace. Install first: claude plugin marketplace add lukasrepublic/agentic-foundry && claude plugin install foundry@agentic-foundry. The plugin then provides /foundry:* skills, its guard hooks, and the foundry-graph MCP, reading this workspace's corpus via CLAUDE_PROJECT_DIR.",
+  "//gh-identity": "Per-project gh identity isolation (OPT-IN, UL-0007): the PreToolUse guard blocks any gh command whose GH_CONFIG_DIR != the account declared in the NEAREST .claude/gh-identity (walking up from the command's cwd → ~/.config/gh-<account>). It is DORMANT until you create .claude/gh-identity, so single-account adopters are unaffected. Bootstrap an account once via .claude/hooks/gh-identity-bootstrap.sh; the resolved GH_CONFIG_DIR is exported by .envrc (direnv) or kept in gitignored settings.local.json. See docs/SETUP.md.",
+  "enabledPlugins": { "foundry@agentic-foundry": true },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/gh-account-guard.sh\"" }
+        ]
+      }
+    ]
+  }
+}

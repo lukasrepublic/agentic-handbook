@@ -1,0 +1,27 @@
+<!-- @dsCard group="Spacing" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spacing — Acme Links</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+  .ramp { display:flex; flex-direction:column; gap:var(--space-2); }
+  .bar { display:flex; align-items:center; gap:var(--space-3); }
+  .swatch { height:var(--space-4); background:var(--color-slate-300); border-radius:var(--radius-sm); }
+  .tag { width:var(--width-spec-tag); font-size:var(--text-xs); font-family:ui-monospace,Menlo,monospace; color:var(--color-text-muted); }
+</style></head>
+<body>
+  <div class="ramp">
+    <div class="bar"><span class="tag">1 · 4px</span><div class="swatch" style="width:var(--space-1)"></div></div>
+    <div class="bar"><span class="tag">2 · 8px</span><div class="swatch" style="width:var(--space-2)"></div></div>
+    <div class="bar"><span class="tag">3 · 12px</span><div class="swatch" style="width:var(--space-3)"></div></div>
+    <div class="bar"><span class="tag">4 · 16px</span><div class="swatch" style="width:var(--space-4)"></div></div>
+    <div class="bar"><span class="tag">5 · 20px</span><div class="swatch" style="width:var(--space-5)"></div></div>
+    <div class="bar"><span class="tag">6 · 24px</span><div class="swatch" style="width:var(--space-6)"></div></div>
+    <div class="bar"><span class="tag">8 · 32px</span><div class="swatch" style="width:var(--space-8)"></div></div>
+    <div class="bar"><span class="tag">10 · 40px</span><div class="swatch" style="width:var(--space-10)"></div></div>
+    <div class="bar"><span class="tag">12 · 48px</span><div class="swatch" style="width:var(--space-12)"></div></div>
+    <div class="bar"><span class="tag">16 · 64px</span><div class="swatch" style="width:var(--space-16)"></div></div>
+  </div>
+  <p style="margin-top:var(--space-6);font-size:var(--text-xs);color:var(--color-text-muted)">4px base ramp · radius sm 6 / md 8 / lg 12 / full</p>
+</body></html>

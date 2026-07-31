@@ -1,0 +1,55 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Input — Acme Links</title>
+<link rel="stylesheet" href="../theme.css">
+</head>
+<body>
+  <div class="row" style="align-items:flex-start">
+    <div class="field">
+      <label class="label" for="u">Long URL</label>
+      <input class="input" id="u" aria-describedby="u-help" placeholder="https://example.com/a/very/long/path">
+      <span class="help" id="u-help">Paste an http(s) link to shorten.</span>
+    </div>
+    <div class="field">
+      <label class="label" for="e">Email</label>
+      <input class="input input-error" id="e" value="not-an-email" aria-invalid="true" aria-describedby="e-err">
+      <span class="help help-error" id="e-err">Enter a valid email address.</span>
+    </div>
+    <div class="field">
+      <label class="label" for="ef">Email (errored + focused)</label>
+      <input class="input input-error" id="ef" value="not-an-email" aria-invalid="true" aria-describedby="ef-err" autofocus>
+      <span class="help help-error" id="ef-err">Error stays visible while you correct the field.</span>
+    </div>
+    <div class="field">
+      <!-- A merely-valid field rests neutral (no green wash); green is reserved for a real completed action. -->
+      <label class="label" for="s">Email (valid, resting)</label>
+      <input class="input" id="s" value="you@example.com" aria-describedby="s-help">
+      <span class="help" id="s-help">Used for expiry and click-report emails.</span>
+    </div>
+    <div class="field">
+      <!-- Success treatment reserved for a genuine completed result (post-save confirmation), not live validity. -->
+      <label class="label" for="sv">Email (saved)</label>
+      <input class="input input-success" id="sv" value="you@example.com" aria-describedby="sv-help">
+      <span class="help help-success" id="sv-help" role="status" aria-live="polite">Email saved.</span>
+    </div>
+    <div class="field">
+      <label class="label" for="d">Short link (read-only)</label>
+      <input class="input" id="d" value="acme.example/r/k3Xt9Qa" readonly aria-describedby="d-help">
+      <span class="help" id="d-help">Read-only — stays focusable and selectable so you can copy it.</span>
+    </div>
+    <div class="field">
+      <!-- Pending/validating: the in-between state while an async availability check is in flight.
+           aria-busy drives the field state; the live region announces progress to AT. -->
+      <label class="label" for="alias">Custom alias (checking availability)</label>
+      <input class="input" id="alias" value="launch-2026" aria-busy="true" aria-describedby="alias-help">
+      <span class="help help-pending" id="alias-help" role="status" aria-live="polite">Checking if this alias is available…</span>
+    </div>
+    <div class="field">
+      <label class="label" for="dis">Custom alias (disabled)</label>
+      <input class="input" id="dis" value="not-on-your-plan" disabled aria-describedby="dis-help">
+      <span class="help" id="dis-help">Disabled — not editable and removed from the tab order (distinct from read-only).</span>
+    </div>
+  </div>
+</body></html>

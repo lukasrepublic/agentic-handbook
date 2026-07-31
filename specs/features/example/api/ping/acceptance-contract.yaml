@@ -1,0 +1,12 @@
+spec_ref: specs/features/example/api/ping/feat-example-api-ping.md
+spec_sha256: "0000000000000000000000000000000000000000000000000000000000000000"  # /foundry:authorize fills this
+scope:
+  allowed_paths:
+    - "src/api/**"
+  denied_paths:
+    - "src/**/auth/**"
+checkpoints:
+  - ac_id: AC-PING-1
+    surface: "api:/ping"
+    locator: "GET /ping"
+    expect: {op: equals, value: '{"ok":true}', baseline: pre-change}

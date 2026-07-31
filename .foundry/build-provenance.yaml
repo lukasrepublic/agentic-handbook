@@ -1,0 +1,12 @@
+foundry_version: 0.10.0
+model_pin: null
+prompt_hash: null
+merge_autonomy_mode: lean
+built_at: 2026-07-02T04:58:36Z
+authorizations:
+  - spec_ref: specs/features/handbook/authoring/context-kit-pointer/feat-handbook-context-kit-pointer.md
+    foundry_authorized_against: agentic-handbook@0c1aecfeb90f7202cb2bbbfdb989792f2538bdb2
+    spec_sha256: eefb79b0f068f961f51eb7ef5608029150645cf8f8360afa96ca7f90096a0671
+    contract_sha256: 678fb40d50a71614791b4176111904998449d94b2014c446814ebfc33cdc2efb
+    auth_seq: 1
+    supersedes: null

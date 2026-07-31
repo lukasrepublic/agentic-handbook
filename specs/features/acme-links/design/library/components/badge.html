@@ -1,0 +1,20 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Badge — Acme Links</title>
+<link rel="stylesheet" href="../theme.css">
+</head>
+<body>
+  <div class="row">
+    <span class="badge">0 clicks</span>
+    <span class="badge">128 clicks</span>
+    <!-- "Active" is the resting/expected state of a live link, so it uses the neutral badge.
+         Green is reserved for a genuine transient confirmation (see "Link created" below). -->
+    <span class="badge">Active</span>
+    <span class="badge badge-warning">Expiring</span>
+    <span class="badge badge-danger">Expired</span>
+    <!-- Success green reserved for a real state-change confirmation (e.g. a just-created link) -->
+    <span class="badge badge-success">Link created</span>
+  </div>
+</body></html>

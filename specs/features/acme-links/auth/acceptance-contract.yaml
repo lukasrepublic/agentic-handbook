@@ -1,0 +1,88 @@
+# Acceptance contract — sibling of feat-handbook-acme-links-auth.md. Production-grade (post-audit).
+spec_ref: specs/features/acme-links/auth/feat-handbook-acme-links-auth.md
+spec_sha256: "0000000000000000000000000000000000000000000000000000000000000000"  # /foundry:authorize fills this
+scope:
+  allowed_paths:
+    - "src/app/(auth)/**"
+    - "src/app/api/me/**"
+    - "src/lib/auth/**"
+    - "src/db/**"
+  denied_paths:
+    - "src/app/r/**"
+    - "src/app/api/links/**"
+    - "src/design-system/**"
+checkpoints:
+  - ac_id: AC-AUTH-1
+    surface: "api:/api/me"
+    locator: "POST /signup {unique email,password} then GET /api/me with returned session → 200 with that user's identity"
+    expect:
+      op: equals
+      value: "200"
+      baseline: pre-change
+  - ac_id: AC-AUTH-2
+    surface: "test:auth"
+    locator: "persisted user credential is a one-way hash (argon2id/bcrypt/scrypt) and != submitted plaintext"
+    expect:
+      op: matches
+      value: '\$(argon2|2[aby]|scrypt)'
+      baseline: none
+  - ac_id: AC-AUTH-3
+    surface: "api:/signup"
+    locator: "POST /signup with an already-registered email → 409, no additional user created"
+    expect:
+      op: equals
+      value: "409"
+      baseline: none
+  - ac_id: AC-AUTH-4
+    surface: "api:/login"
+    locator: "POST /login {valid credentials} → 200, and follow-on GET /api/me with session → 200"
+    expect:
+      op: equals
+      value: "200"
+      baseline: none
+  - ac_id: AC-AUTH-5
+    surface: "api:/login"
+    locator: "POST /login {invalid credentials} → 401, no session, response uniform across unknown-user vs wrong-password"
+    expect:
+      op: equals
+      value: "401"
+      baseline: none
+  - ac_id: AC-AUTH-6
+    surface: "api:/api/me"
+    locator: "POST /logout, then GET /api/me reusing the pre-logout session → 401 (session invalidated server-side)"
+    expect:
+      op: equals
+      value: "401"
+      baseline: none
+  - ac_id: AC-AUTH-7
+    surface: "api:/api/me"
+    locator: "GET /api/me with no session → 401; AND with spoofed x-middleware-subrequest header + no session → 401 (handler-enforced, CVE-2025-29927)"
+    expect:
+      op: equals
+      value: "401"
+      baseline: pre-change
+  - ac_id: AC-AUTH-8
+    surface: "test:auth"
+    locator: "login Set-Cookie carries HttpOnly + Secure + SameSite and a bounded TTL"
+    expect:
+      op: matches
+      value: 'HttpOnly'
+      baseline: none
+  - ac_id: AC-AUTH-9
+    surface: "api:/login"
+    locator: "after N failed POST /login within the window → 429 (rate-limited)"
+    expect:
+      op: equals
+      value: "429"
+      baseline: none
+target_repo: app        # the acme-links code repo (repos.app in the workspace manifest)
+# === FOUNDRY-AUTHORIZED-TRAILER (excluded from contract_sha256) ===
+authorized:
+  operator_id: op_lukas
+  authorized_at: 2026-07-31T17:04:53Z
+  auth_seq: 2
+  supersedes: 928be1f07a3989228c6ac18ce9c077b7bec662b137920a040b68e743b15fff44
+  spec_sha256: 904bfea09118a247284c5263a3118697eb2150836e954b4e74b14b7f564ee9c2
+  contract_sha256: 66a919fb037714f0869712d1f70b73b1592299d54d83e75ea2ae58bc40f94f0d
+  merge_autonomy_mode: regular
+  reauth_after_impl: true

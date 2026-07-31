@@ -1,0 +1,325 @@
+/* Acme Links — design tokens (framework-agnostic core).
+   In-app these are projected through Tailwind v4 @theme; here they are plain CSS custom
+   properties so every preview renders standalone in the Claude Design pane. */
+
+/* Self-hosted Inter (woff2) — uploaded with the project so Claude Design renders the brand
+   font, not a substitute. In-app, prefer @fontsource/inter or next/font over these files. */
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/inter-400.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("fonts/inter-500.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/inter-600.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/inter-700.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url("fonts/inter-800.woff2") format("woff2"); }
+
+:root {
+  /* — Brand / primary (Indigo) — */
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-active: #3730a3;
+  --color-on-primary: #ffffff;
+  --color-primary-soft: #eef2ff;
+
+  /* — Neutral (Slate) — */
+  --color-slate-50:  #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  /* — Semantic — */
+  --color-success: #059669;
+  --color-success-text: #065f46; /* AA-safe success text on success-soft (>=4.5:1) */
+  --color-success-soft: #ecfdf5;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-danger-active: #991b1b;
+  --color-danger-soft: #fef2f2;
+  --color-danger-badge-text: var(--color-danger-hover); /* #b91c1c — AA-safe (>=4.5:1) danger text on danger-soft; raw #dc2626 is only 4.41:1 there */
+  --color-warning: #d97706;
+
+  /* — Surface roles (light) — */
+  --color-bg: var(--color-slate-50);
+  --color-surface: #ffffff;
+  --color-surface-2: var(--color-slate-100);
+  --color-border: var(--color-slate-200);
+  --color-text: var(--color-slate-900);
+  --color-text-muted: var(--color-slate-600); /* slate-600 clears 4.5:1 on white/slate-50/slate-100 */
+  --color-input-border: var(--color-slate-500); /* >=3:1 UI-component boundary against surface */
+  --color-control-border: var(--color-slate-500); /* >=3:1 boundary for interactive controls (secondary/ghost buttons) */
+  --ring: var(--color-primary); /* solid full-opacity ring; >=3:1 focus indicator */
+  --color-danger-text: var(--color-danger); /* AA-safe danger TEXT on surface; remapped lighter in dark */
+  --color-warning-text: #92400e; /* amber-800 ≈ 5.9:1 on white; #d97706 is fill/large-graphic only, never body text */
+  --color-warning-soft: #fffbeb;
+
+  /* — Typography — */
+  --font-sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --text-xs: 0.75rem; --text-sm: 0.875rem; --text-base: 1rem; --text-lg: 1.125rem;
+  --text-xl: 1.25rem; --text-2xl: 1.5rem; --text-3xl: 1.875rem; --text-4xl: 2.25rem;
+  --font-normal: 400; --font-medium: 500; --font-semibold: 600; --font-bold: 700; --font-extrabold: 800;
+  --leading-display: 1.1; --leading-tight: 1.2; --leading-normal: 1.5; /* tight: lg/xl headings (see foundations/typography.html) */
+  /* — Tracking (letter-spacing) — */
+  --tracking-tight: -0.03em; --tracking-wide: .04em; --tracking-wider: .08em;
+
+  /* — Spacing (4px base) — */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px;
+  --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px; --space-16: 64px;
+
+  /* — Content widths (single source for the duplicated container max-widths) — */
+  --width-field: 360px; --width-card: 420px; --width-empty: 520px; --width-table: 680px; --width-page: 1080px;
+
+  /* — Prose measure (line-length caps, in ch; single source for readable-width prose) — */
+  --measure: 64ch; --measure-narrow: 56ch;
+
+  /* — Radius — */
+  --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px; --radius-full: 9999px;
+
+  /* — Elevation — */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.1), 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.1);
+
+  /* — Borders / hairlines — */
+  --border-width: 1px;        /* single-source hairline thickness */
+
+  /* — Focus ring / spinner geometry — */
+  --focus-ring-width: 4px;    /* outer focus ring thickness */
+  --focus-ring-inner: 1px;    /* inner surface gap so the ring reads on both surfaces */
+  --spinner-width: 2px;       /* busy-spinner border thickness */
+  --icon-stroke: 2px;         /* line-icon glyph stroke thickness */
+
+  /* — Fixed component sizes (on the 4px grid, but not named --space-N ramp steps; single-sourced here) — */
+  --size-touch-target: 44px;  /* WCAG target-size floor for coarse pointers */
+  --size-mark: 44px;          /* wordmark mark square */
+  --size-brand-mark: 28px;    /* shell brand-mark glyph */
+  --size-icon: 24px;          /* line-icon glyph footprint (width/height) */
+
+  /* — Swatch / spec-label geometry (single source for the duplicated demo chrome) — */
+  --swatch-w: 96px; --swatch-h: 56px; /* color-chip dimensions (on the 4px grid, not ramp steps; anchored once) */
+  --width-spec-tag: 88px;     /* spec/ramp label-column width */
+
+  /* — Breakpoints (informational; CSS vars cannot be used in @media conditions,
+        so the literals below are kept in deliberate sync with this token) — */
+  --bp-mobile: 640px; /* covers the full small-screen band (390-640px) incl. large phones in landscape; the table still scrolls below its 680px min-width */
+}
+
+[data-theme="dark"] {
+  --color-bg: var(--color-slate-900);
+  --color-surface: var(--color-slate-800);
+  --color-surface-2: var(--color-slate-700);
+  --color-border: var(--color-slate-700);
+  --color-text: var(--color-slate-50);
+  --color-text-muted: var(--color-slate-300); /* slate-300 clears 4.5:1 on slate-700 (surface-2) AND slate-800; slate-400 was 4.04:1 on surface-2 */
+  --color-primary-soft: #312e81;
+  --ring: #a5b4fc;               /* indigo-300 ≈ 7:1 on slate-800; clears 3:1 focus floor in dark */
+  --color-danger-text: #f87171;  /* red-400 ≈ 5.9:1 on slate-800; saturated mid-red fails as text on dark */
+  --color-warning-text: #fbbf24; /* amber-400, AA-safe warning text on dark surfaces */
+  --color-success-text: #6ee7b7; /* emerald-300 ≈ 8:1 on slate-800; #065f46 fails as text on dark */
+  /* -text and -soft are remapped as a PAIR: the light soft tints (#ecfdf5/#fef2f2/#fffbeb) render
+     light-on-light in dark mode, so each soft surface is darkened to keep its badge text >=4.5:1. */
+  --color-success-soft: #064e3b; /* emerald-900 — #6ee7b7 text clears 4.5:1 here */
+  --color-danger-soft: #450a0a;  /* near-black red — #f87171 text clears 4.5:1 here */
+  --color-warning-soft: #422006; /* near-black amber — #fbbf24 text clears 4.5:1 here */
+  --color-danger-badge-text: var(--color-danger-text); /* #f87171 clears 4.5:1 on the dark danger-soft */
+}
+
+/* ── Base / preview chrome ────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: var(--space-8);
+  font-family: var(--font-sans); font-size: var(--text-base);
+  color: var(--color-text); background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+.row { display: flex; gap: var(--space-3); align-items: center; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: var(--space-3); }
+
+/* ── Button ───────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  font-family: inherit; font-weight: var(--font-medium); font-size: var(--text-sm);
+  border: var(--border-width) solid transparent; border-radius: var(--radius-md);
+  min-height: var(--space-10); /* 40px target floor */
+  padding: var(--space-2) var(--space-4); cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.btn:focus-visible { outline: none; box-shadow: 0 0 0 var(--focus-ring-inner) var(--color-surface), 0 0 0 var(--focus-ring-width) var(--ring); }
+.btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
+.btn-primary:hover { background: var(--color-primary-hover); }
+.btn-primary:active { background: var(--color-primary-active); }
+/* Secondary/ghost get a >=3:1 control boundary (decorative --color-border alone fails 1.4.11) */
+.btn-secondary { background: var(--color-surface); color: var(--color-text); border-color: var(--color-control-border); }
+.btn-secondary:hover { background: var(--color-surface-2); }
+.btn-secondary:active { background: var(--color-border); }
+.btn-ghost { background: transparent; color: var(--color-text); }
+.btn-ghost:hover { background: var(--color-surface-2); border-color: var(--color-control-border); }
+.btn-ghost:active { background: var(--color-border); }
+.btn-danger { background: var(--color-danger); color: var(--color-on-primary); }
+.btn-danger:hover { background: var(--color-danger-hover); }
+.btn-danger:active { background: var(--color-danger-active); }
+/* btn-sm reduces padding/type for dense rows but keeps the 40px target floor for mouse users */
+.btn-sm { min-height: var(--space-10); padding: var(--space-1) var(--space-3); font-size: var(--text-xs); }
+.btn-lg { padding: var(--space-3) var(--space-5); font-size: var(--text-base); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+/* Loading / busy — spinner via ::before, suppressed under reduced-motion */
+.btn[aria-busy="true"] { pointer-events: none; opacity: .8; }
+.btn[aria-busy="true"]::before {
+  content: ""; width: 1em; height: 1em; border-radius: var(--radius-full);
+  border: var(--spinner-width) solid currentColor; border-top-color: transparent;
+  animation: btn-spin .6s linear infinite;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .btn[aria-busy="true"]::before { animation: none; } }
+/* Coarse-pointer (touch) targets reach the touch floor. The mobile-width clause also applies the floor on
+   touch devices that misreport as fine/no-pointer (hybrid laptops, some phones) at the ~390-480px target. */
+@media (pointer: coarse), (max-width: 640px) { .btn, .btn-sm, .nav-links a { min-height: var(--size-touch-target); } }
+
+/* ── Input ────────────────────────────────────────────────────────────── */
+.field { display: flex; flex-direction: column; gap: var(--space-1); width: 100%; max-width: var(--width-field); min-width: 0; }
+.label { font-size: var(--text-sm); font-weight: var(--font-medium); }
+.input {
+  width: 100%; min-width: 0;
+  font-family: inherit; font-size: var(--text-sm); color: var(--color-text);
+  background: var(--color-surface); border: var(--border-width) solid var(--color-input-border);
+  border-radius: var(--radius-md); padding: var(--space-2) var(--space-3);
+}
+.input::placeholder { color: var(--color-text-muted); }
+/* Pre-focus hover cue (matches the hover affordance buttons/nav/rows/sort-headers all carry).
+   Scoped so it never overrides the error/success border colors or the disabled/read-only states. */
+.input:hover:not(:disabled):not([readonly]):not(.input-error):not(.input-success) { border-color: var(--color-slate-400); }
+.input:focus-visible { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 var(--focus-ring-inner) var(--color-surface), 0 0 0 var(--focus-ring-width) var(--ring); }
+.input-error { border-color: var(--color-danger); }
+/* Errored-and-focused: keep the danger color while showing the focus ring (beats .input:focus-visible) */
+.input-error:focus-visible { border-color: var(--color-danger); box-shadow: 0 0 0 var(--focus-ring-inner) var(--color-surface), 0 0 0 var(--focus-ring-width) var(--color-danger); }
+.input-success { border-color: var(--color-success); }
+.input-success:focus-visible { border-color: var(--color-success); box-shadow: 0 0 0 var(--focus-ring-inner) var(--color-surface), 0 0 0 var(--focus-ring-width) var(--color-success); }
+.input:disabled, .input[aria-disabled="true"] { background: var(--color-surface-2); color: var(--color-text-muted); cursor: not-allowed; opacity: .7; }
+/* Read-only: display-only value stays focusable/selectable/copyable (NOT disabled) */
+.input[readonly] { background: var(--color-surface-2); color: var(--color-text); cursor: default; }
+.help { font-size: var(--text-xs); color: var(--color-text-muted); }
+/* Error help text carries a non-color (icon) indicator so state is not color-only */
+.help-error { color: var(--color-danger-text); display: inline-flex; align-items: center; gap: var(--space-1); }
+.help-error::before { content: "\26A0"; font-size: 1em; line-height: 1; }
+/* Success help text mirrors the error pattern with a checkmark glyph */
+.help-success { color: var(--color-success-text); display: inline-flex; align-items: center; gap: var(--space-1); }
+.help-success::before { content: "\2713"; font-size: 1em; line-height: 1; }
+/* Pending/validating — the in-between state for async checks (e.g. custom-alias availability).
+   A trailing inline spinner reuses the btn-spin keyframes / --spinner-width; suppressed under reduced-motion. */
+.input[aria-busy="true"] { background-image: none; }
+.input[aria-busy="true"] { border-color: var(--color-input-border); }
+.help-pending { color: var(--color-text-muted); display: inline-flex; align-items: center; gap: var(--space-1); }
+.help-pending::before { content: ""; width: 1em; height: 1em; border-radius: var(--radius-full);
+  border: var(--spinner-width) solid currentColor; border-top-color: transparent;
+  animation: btn-spin .6s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .help-pending::before { animation: none; } }
+
+/* ── Card ─────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--color-surface); border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.card-header { margin: 0; padding: var(--space-4) var(--space-5); border-bottom: var(--border-width) solid var(--color-border); font-size: var(--text-lg); font-weight: var(--font-medium); }
+.card-body { padding: var(--space-5); }
+.card-footer { padding: var(--space-4) var(--space-5); border-top: var(--border-width) solid var(--color-border); background: var(--color-surface-2); }
+
+/* ── Table ────────────────────────────────────────────────────────────── */
+/* min-width keeps the columns intact and lets .table-wrap scroll on narrow viewports
+   (instead of crushing cells to char-by-char wraps); overflow-wrap stays as a final safety net. */
+.table { width: 100%; min-width: var(--width-table); border-collapse: collapse; font-size: var(--text-sm); }
+.table th { text-align: left; font-weight: var(--font-semibold); color: var(--color-text-muted);
+  font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-wide);
+  padding: var(--space-3) var(--space-4); border-bottom: var(--border-width) solid var(--color-border); }
+/* A sortable th delegates its padding to the inner <button> so the whole padded cell is the hit/focus target */
+.table th:has(button) { padding: 0; }
+.table td { padding: var(--space-3) var(--space-4); border-bottom: var(--border-width) solid var(--color-border); }
+.table tbody tr:hover { background: var(--color-surface-2); }
+/* Empty/error rows are non-interactive status rows — exclude them from the hover wash so their
+   text keeps its resting (AA-verified) contrast even when the pointer is over the row. */
+.table tbody tr.table-empty:hover, .table tbody tr.table-error:hover { background: transparent; }
+.table tr:last-child td { border-bottom: none; }
+/* Sortable headers carry a real <button> (WAI-ARIA grid sortable pattern); aria-sort stays on th */
+.table th[aria-sort] { cursor: pointer; }
+.table th button { font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; text-align: inherit;
+  background: none; border: 0; margin: 0; cursor: pointer; display: flex; width: 100%; align-items: center;
+  /* Fill the header cell's padded box so the clickable/focusable target matches the th (not just the 12px label) */
+  padding: var(--space-3) var(--space-4); }
+.table th button:hover { color: var(--color-text); }
+.table th button:focus-visible { outline: none; border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 var(--focus-ring-inner) var(--color-surface), 0 0 0 var(--focus-ring-width) var(--ring); }
+.table th[aria-sort="ascending"] button::after { content: " \2191"; }
+.table th[aria-sort="descending"] button::after { content: " \2193"; }
+/* Sortable-but-unsorted: low-emphasis double-arrow so it reads as sortable, not plain */
+.table th[aria-sort="none"] button::after { content: " \2195"; opacity: .4; }
+/* No data to sort while loading/empty/errored — disable the sort controls so they aren't a dead-end */
+.table[aria-busy="true"] th button, .table th button:disabled { cursor: default; opacity: .5; pointer-events: none; }
+/* Loading skeleton rows (static under reduced-motion) */
+.table .skeleton { display: block; height: 1em; border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--color-surface-2), var(--color-border), var(--color-surface-2));
+  background-size: 200% 100%; animation: skeleton-shimmer 1.2s ease-in-out infinite; }
+@keyframes skeleton-shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .table .skeleton { animation: none; } }
+/* In-table empty + error rows (zero-result / load-failure treatments) */
+.table .table-empty td, .table .table-error td { text-align: center; color: var(--color-text-muted); padding: var(--space-8) var(--space-4); }
+.table .table-error td { color: var(--color-danger-text); }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+/* Long destination URLs wrap instead of blowing out the row width */
+.table td { overflow-wrap: anywhere; }
+/* Horizontal-scroll wrapper so wide tables are reachable, never clipped */
+.table-wrap { width: 100%; overflow-x: auto; }
+
+/* ── Badge ────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: var(--space-1);
+  font-size: var(--text-xs); font-weight: var(--font-medium);
+  padding: var(--space-1) var(--space-2); border-radius: var(--radius-full);
+  background: var(--color-surface-2); color: var(--color-text);
+}
+/* Click counts and other metrics use the neutral .badge — indigo is reserved for the single
+   filled primary action per view and the brand mark; never for arbitrary decoration or data. */
+.badge-success { background: var(--color-success-soft); color: var(--color-success-text); }
+.badge-danger  { background: var(--color-danger-soft);  color: var(--color-danger-badge-text); }
+.badge-warning { background: var(--color-warning-soft); color: var(--color-warning-text); }
+
+/* ── Empty state ──────────────────────────────────────────────────────── */
+.empty { text-align: center; padding: var(--space-12) var(--space-6); max-width: var(--width-card); margin: 0 auto; }
+/* (warning soft/text tokens are AA-safe siblings of the raw --color-warning fill) */
+.empty-icon { width: var(--space-12); height: var(--space-12); border-radius: var(--radius-full); background: var(--color-surface-2);
+  display: inline-flex; align-items: center; justify-content: center; color: var(--color-text-muted); margin-bottom: var(--space-4); }
+/* Glyph geometry is token-driven (viewBox stays the SVG coordinate space, set inline) */
+.empty-icon svg { width: var(--size-icon); height: var(--size-icon); stroke-width: var(--icon-stroke); }
+.empty-title { font-size: var(--text-lg); font-weight: var(--font-semibold); margin: 0 0 var(--space-2); }
+.empty-body { color: var(--color-text-muted); margin: 0 0 var(--space-5); }
+
+/* ── App shell ────────────────────────────────────────────────────────── */
+.shell-nav { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3);
+  padding: var(--space-3) var(--space-6); background: var(--color-surface);
+  border-bottom: var(--border-width) solid var(--color-border); }
+.brand { display: flex; align-items: center; gap: var(--space-2); font-weight: var(--font-bold); }
+.brand-mark { width: var(--size-brand-mark); height: var(--size-brand-mark); border-radius: var(--radius-md); background: var(--color-primary); color: var(--color-on-primary);
+  display: inline-flex; align-items: center; justify-content: center; font-size: var(--text-sm); }
+.nav-links { display: flex; gap: var(--space-2); align-items: center; list-style: none; margin: 0; padding: 0; font-size: var(--text-sm); }
+.nav-links a, .nav-links [role="link"] { display: inline-flex; align-items: center; min-height: var(--space-10); padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md); color: var(--color-text-muted); text-decoration: none; }
+.nav-links a:hover { color: var(--color-text); }
+.nav-links a:active { background: var(--color-surface-2); }
+.nav-links a:focus-visible { outline: none; box-shadow: 0 0 0 var(--focus-ring-inner) var(--color-surface), 0 0 0 var(--focus-ring-width) var(--ring); }
+.nav-links a[aria-current="page"] { color: var(--color-text); font-weight: var(--font-medium); }
+/* Disabled nav item: rendered as a non-anchor [role=link] with tabindex=-1 so it is unreachable
+   AND non-activatable by keyboard (pointer-events alone only blocks the mouse). */
+.nav-links a[aria-disabled="true"], .nav-links [role="link"][aria-disabled="true"] {
+  color: var(--color-text-muted); opacity: .5; pointer-events: none; }
+/* @media literal kept in deliberate sync with --bp-mobile (640px); CSS vars can't be used in @media conditions */
+@media (max-width: 640px) {
+  /* Reduce preview chrome so component cards aren't pinned flush to both edges on mobile */
+  body { padding: var(--space-4); }
+  .shell-nav { padding: var(--space-3) var(--space-4); }
+  /* Left-align + let nav-links take a full row so space-between doesn't ragged-distribute single items */
+  .shell-nav { justify-content: flex-start; }
+  .shell-nav .nav-links { flex-basis: 100%; }
+  /* When fields stack, tighten the cross-axis gutter to the kit's 12-16px field rhythm
+     (single-sourced here instead of per-file local <style>; relies on class gap, not inline gap). */
+  .row { gap: var(--space-4); }
+}

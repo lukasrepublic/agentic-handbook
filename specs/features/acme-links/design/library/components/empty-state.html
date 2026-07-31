@@ -1,0 +1,22 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Empty state — Acme Links</title>
+<link rel="stylesheet" href="../theme.css">
+</head>
+<body>
+  <!-- Dashboard with zero links (AC-DASH-4). The empty-state marker the contract checks for. -->
+  <div class="card" style="max-width:var(--width-empty)">
+    <div class="card-body">
+      <div class="empty" data-testid="empty-state">
+        <span class="empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </span>
+        <h3 class="empty-title">No links yet</h3>
+        <p class="empty-body">Create your first short link. It will appear here with its click count.</p>
+        <button class="btn btn-primary">Create link</button>
+      </div>
+    </div>
+  </div>
+</body></html>
