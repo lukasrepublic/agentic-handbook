@@ -101,7 +101,8 @@ repo with its own history, PRs, CI and merge floor. The factory dispatches work 
 │   └── foundry-project.json   ◀── THE MANIFEST. repos{} maps a dispatch key → a path below.
 ├── specs/
 │   ├── features/<product>/…                 the WHAT: feat-*.md + acceptance-contract.yaml
-│   └── releases/ · lifecycle/               release manifests + generated lifecycle views
+│   └── lifecycle/                           generated lifecycle views (never hand-edited)
+├── .foundry/releases/<id>/release.yaml      the authoritative release manifest
 ├── docs/ · status-reports/ · context/
 ├── .gitignore                 ◀── every hosted repo below is listed here, root-anchored (/api/)
 │
@@ -136,8 +137,15 @@ A spec reaches a repo by naming its manifest key:
 ```
 
 **Starting with one repo?** That is the default — a fresh template seeds only the `workspace`
-self-entry, a contract with no `target_repo` is workspace-targeted, and `/foundry:doctor` stays
-green. Add hosted repos when you have them: **[`docs/SETUP.md` → Multi-repo control plane](docs/SETUP.md#multi-repo-control-plane--hosting-your-code-repos)**.
+self-entry, and a contract with no `target_repo` is workspace-targeted. Nothing to configure
+until you add a second repo.
+
+> **Running more than one repo? Read [`docs/control-plane.md`](docs/control-plane.md) first.**
+> It is the guide to operating this workspace as a control plane: the on-disk layout, the
+> **session rule** (always start Claude Code at this root, never inside a hosted repo — and what
+> silently breaks if you don't), the add-a-repo runbook, and day-two operations. The
+> add-a-repo mechanics alone are in
+> [`docs/SETUP.md`](docs/SETUP.md#multi-repo-control-plane--hosting-your-code-repos).
 
 ## License
 

@@ -228,8 +228,13 @@ Different jobs — see architecture.md §3.
 
 ## Multi-repo control plane — hosting your code repos
 
-This workspace can be a **control center** that hosts the project's *other* repos — its
+This workspace can be a **control plane** that hosts the project's *other* repos — its
 infrastructure (IaC) repo, service repos, any number — and drives the factory into each.
+
+> **This section is the add-a-repo mechanics.** The operating model — the session rule, building
+> one atom across two repos, day-two operations, and the symptom→cause table for when things look
+> wrong — is in **[`control-plane.md`](control-plane.md)**. Read that first if you are setting up
+> a multi-repo project; come back here for the runbook.
 
 ### What it looks like on disk
 
@@ -261,7 +266,7 @@ keeps failing to convey:
 Read the boundaries, because they are what make this work:
 
 - **`git status` in the workspace never shows anything from `acme-links/` or `infra/`.** They are
-  root-anchored gitignore entries. The control center cannot accidentally commit your app.
+  root-anchored gitignore entries. The control plane cannot accidentally commit your app.
 - **Each hosted repo keeps a fully independent history** — its own PRs, its own CI, its own
   branch protection. The workspace is never pinned to a submodule commit pointer.
 - **The link runs the other way.** Rather than the workspace tracking the code, each built atom
@@ -297,19 +302,36 @@ whose `target_repo` was missing entirely, so every path in them matched zero fil
 **independent, gitignored sibling subdirs**, named by a **manifest** — here,
 `.claude/foundry-project.json` `repos{}` (the *same* manifest the factory's multi-repo dispatch
 already reads; there is **no second artifact**). We deliberately do **not** use **git
-submodules**: submodules couple the control center to a pinned submodule commit, require manual
+submodules**: submodules couple the control plane to a pinned submodule commit, require manual
 `git submodule update`, and entangle histories — the wrong fit for a hub of *fully independent*
 repos. Gitignored siblings + a manifest keeps each hosted repo's history its own. (This is the
 established lightweight multi-repo convention, e.g. the `meta` tool.)
 
 **A fresh template is single-repo.** The seeded `repos{}` carries only the `workspace` self-entry
-(`path: "."`), so `/foundry:doctor` reports a single-repo adopter and stays `DOCTOR-GREEN`. You add
-hosted repos **live, only once cloned** — never as dangling entries.
+(`path: "."`), which is the single-repo default: a contract with no `target_repo` is
+workspace-targeted, and there is nothing to configure until you clone a second repo in.
+
+> **Add hosted repos only once cloned — never as dangling entries, and check your spelling.**
+> This matters more than it looks, and nothing currently catches it for you:
+> `/foundry:doctor`'s five checks (plugin manifest, hooks, skill frontmatter, stack-profile lock,
+> operator registry) **do not read `repos{}` at all**, so a dangling entry stays `DOCTOR-GREEN`.
+>
+> The cost lands at authorization. When a contract's `target_repo` does not resolve to a real
+> directory — a typo, or a repo you have not cloned yet — `/foundry:authorize` cannot establish a
+> venue root, and **five grounding floors degrade to warnings and the freeze proceeds anyway**:
+> the surface⊆scope check, the doctor-row baseline check, the system-grounding floor, the
+> `allowed_paths` reality-grounding check, and checkpoint-locator grounding. Each prints a
+> `warn: … degraded` / `SKIPPED` line, so the information is on screen — but a typo and a
+> not-yet-cloned repo look identical, and the contract still freezes and still increments
+> `auth_seq`.
+>
+> **Read the `warn:` lines in the authorize dry-run before you confirm.** If you did not expect a
+> degrade, you have a manifest defect, not a missing checkout.
 
 ### Add a hosted repo (runbook)
 
 1. **Clone it into a root-anchored, gitignored subdir.** Add the dir to `.gitignore` under the
-   *hosted repos* section (root-anchored with a leading slash so the control center never tracks
+   *hosted repos* section (root-anchored with a leading slash so the control plane never tracks
    it), then clone:
    ```bash
    #  .gitignore →  /infra/
@@ -319,7 +341,7 @@ hosted repos **live, only once cloned** — never as dangling entries.
    dispatch key**; the shape is exactly what the resolver reads (`repos.<key>.path`):
    ```json
    "repos": {
-     "workspace": { "path": ".", "kind": "workspace", "role": "the control center" },
+     "workspace": { "path": ".", "kind": "workspace", "role": "the control plane" },
      "infra":     { "path": "infra", "kind": "infra-repo", "role": "the project's IaC (OpenTofu/Kubernetes)" }
    }
    ```

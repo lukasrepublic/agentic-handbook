@@ -36,22 +36,29 @@ architecture sign-off, enforcement-grade anti-patterns). Read the line per invoc
 3. **Security review** on auth / PII / payments / secrets / external-API surfaces.
 4. **Typed contracts** at boundaries; **git discipline** (no force-push to `main`, PR-then-merge).
 
-## Multi-repo control center (hosting infra + service repos)
+## Multi-repo control plane (hosting infra + service repos)
 
-This workspace can act as a **control center** that hosts the project's other repos — its
+**Full guide: [`docs/control-plane.md`](docs/control-plane.md) — read it before adding a second
+repo.** It covers the on-disk layout, the session rule, and the day-two operations.
+
+This workspace can act as a **control plane** that hosts the project's other repos — its
 infrastructure (IaC) repo, service repos, any number of them — as **independent, gitignored
 sibling subdirs** (the **meta-repo** pattern: gitignored siblings + a manifest, *not* git
 submodules). The manifest is `.claude/foundry-project.json` `repos{}`: each hosted repo is one
 entry keyed by a **`target_repo` dispatch key**, into which the factory dispatches workers (a
 worker is redirected into the hosted repo's working tree; its merge floor is that repo's own).
 
-- **Single-repo by default.** A fresh workspace seeds only the `workspace` self-entry → the
-  doctor treats it as a single-repo adopter. You stay `DOCTOR-GREEN` until you add a hosted repo.
+- **Always start your Claude Code session at this root**, never inside a hosted repo — the
+  factory resolves the corpus, the operator registry and the manifest from the session's project
+  directory. See [`docs/control-plane.md`](docs/control-plane.md) → *The session rule*.
+- **Single-repo by default.** A fresh workspace seeds only the `workspace` self-entry, so a
+  contract with no `target_repo` is workspace-targeted. Nothing to configure until you add a
+  hosted repo.
 - **Add a hosted repo** when you clone one in — clone into the gitignored subdir, add its
   `repos.<key>` entry (`path`/`kind`/`role`), and dispatch by that key. Step-by-step:
-  [`docs/SETUP.md`](docs/SETUP.md) → *Multi-repo control center*.
+  [`docs/SETUP.md`](docs/SETUP.md) → *Multi-repo control plane*.
 - **Why siblings, not submodules:** each hosted repo keeps a fully independent history; the
-  control center is never coupled to a submodule commit pointer. (Rationale in SETUP.md.)
+  control plane is never coupled to a submodule commit pointer. (Rationale in SETUP.md.)
 
 ## Conventions
 
@@ -60,8 +67,9 @@ worker is redirected into the hosted repo's working tree; its merge floor is tha
   cosmetic edits) + a sibling `acceptance-contract.yaml`. Templates ship with the foundry plugin
   (its `context/` kit — the canonical source; see `context/README.md`), not the workspace.
 - **Citation grammar** — the `[Doc:]`/`[Atom:]` forms; the grammar ships in the foundry plugin's kit.
-- **Releases** — `specs/releases/<…>/release.yaml` is the authoritative manifest; lifecycle
-  views under `specs/lifecycle/` are generated, never hand-edited.
+- **Releases** — `.foundry/releases/<id>/release.yaml` is the authoritative manifest (that exact
+  path is where the factory resolves it — `<id>` is an `[a-z0-9-]+` slug); lifecycle views under
+  `specs/lifecycle/` are generated, never hand-edited.
 - **Git discipline** — branch per atom; PR-then-merge; the merge floor admits the merge.
 
 ## Implementation-merge autonomy (per-session)

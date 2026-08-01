@@ -40,7 +40,7 @@ is built without it.
 | 0–1 | LLM-friendly functional spec (AC-IDs, normative region) | same file (the `<!-- normative -->` region) |
 | 1 | review evidence | `.foundry/` (runtime, gitignored) — the review is content-bound to the spec's hash |
 | 2 | frozen acceptance contract | `…/acceptance-contract.yaml` (operator-signed `authorized:` block) |
-| 3 | release manifest | `specs/releases/<…>/release.yaml` |
+| 3 | release manifest | `.foundry/releases/<id>/release.yaml` (`<id>` is an `[a-z0-9-]+` slug — the factory resolves this exact path) |
 | — | lifecycle views (generated) | `specs/lifecycle/<state>/manifest.yaml` — never hand-edited |
 | 4 | the PR + its checks | the code repo (the PR body carries `Spec: <path>` — the spec-link) |
 | 4 | build-provenance | in the **code repo** (`.foundry/build-provenance.yaml`, pins this workspace's commit) |
@@ -64,7 +64,7 @@ is built without it.
   `.foundry/build-provenance.yaml` pins the workspace commit it was authorized against.
   Hosted repos are **gitignored sibling subdirs** declared in `.claude/foundry-project.json`
   `repos{}`; the contract's `target_repo:` (hash-covered) names where the code lands. Full
-  pattern: the plugin's `docs/how-to/multi-repo-control-center.md`.
+  pattern: the plugin's `docs/how-to/multi-repo-control-plane.md`.
 
 ## Unsure what to do next?
 

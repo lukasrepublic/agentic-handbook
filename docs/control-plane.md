@@ -79,19 +79,30 @@ lives at the control-plane root:
 
 | What the factory needs | Where it lives | If you start in `api/` |
 |---|---|---|
-| The plugin itself | `.claude/settings.json` → `enabledPlugins` | **Not loaded.** No `/foundry:*` verbs at all. |
 | Operator registry | `.claude/foundry-operators.json` | **Missing** → authorization fails closed; nothing can be frozen. |
 | The repo manifest | `.claude/foundry-project.json` → `repos{}` | **Missing** → `target_repo` resolves to nothing; dispatch has no venue. |
 | Your specs + contracts | `specs/features/…` | **Not there** — the code repo holds code, not the WHAT. |
-| Governance + hooks | `CLAUDE.md`, `.claude/hooks/` | **Not applied** — the git-discipline guard does not fire. |
+| Workspace governance + hooks | `CLAUDE.md`, `.claude/hooks/` | **Not applied** — your workspace's own guards do not fire. |
 
-So a session started inside a hosted repo is not "the factory with a narrower view." It is a
-**plain Claude Code session with none of the governance** — and it will happily let an agent
-write code that no frozen contract authorized.
+**Whether the `/foundry:*` verbs themselves appear depends on where the plugin was enabled**, and
+both outcomes are bad in different ways:
 
-> **There is currently no guard that detects this.** A session started in the wrong directory
-> fails by *absence* — the verbs simply are not there — rather than with a clear error. Treat the
-> rule as load-bearing until a preflight check exists.
+- **Enabled per-project** (`<the control plane>/.claude/settings.json`): the plugin does not load
+  in `api/` at all. No verbs. The session fails by *absence* — nothing errors, the commands are
+  simply missing.
+- **Enabled user-wide** (`~/.claude/settings.json`, which is where `claude plugin install` puts it
+  by default): the verbs **do** load in `api/` — pointed at the wrong root. This is the more
+  dangerous case, because the factory *looks* available while the corpus, the operator registry
+  and the manifest it governs are all absent. You can start working and discover nothing was
+  governed.
+
+Either way, a session started inside a hosted repo is not "the factory with a narrower view." It is
+a session **with none of your governance**, and it will let an agent write code that no frozen
+contract authorized.
+
+> **Nothing detects this today.** A preflight check is specified
+> (`feat-foundry-control-plane-preflight`) and will convict the user-wide case, where the doctor is
+> reachable. Until it ships, the rule above is the only defence.
 
 **You still work on code in the hosted repos** — the factory dispatches workers into those
 working trees for you, and each repo's own PR and merge floor govern what lands. You just drive
@@ -155,8 +166,14 @@ claude          # from acme-handbook/
 ```
 
 A fresh template is **single-repo**: the seeded `repos{}` has only the `workspace` self-entry, and
-that is a valid, green state. Do not add manifest entries for repos you have not cloned yet — a
-dangling entry fails the doctor.
+that is a valid, green state.
+
+**Do not add manifest entries for repos you have not cloned yet.** A dangling entry is not caught
+by anything today — the doctor's five checks do not read `repos{}` — and it does not fail loudly
+later either: it makes `/foundry:authorize` skip five of its grounding floors with a printed
+warning and freeze the contract anyway (§4). A check that convicts a dangling entry is queued as
+`feat-foundry-control-plane-preflight`; until it ships, adding entries only for repos that exist
+is the defence.
 
 ### Step 4 — bring in your first code repo
 
@@ -187,9 +204,10 @@ will name:
 }
 ```
 
-`boot_command` is the **app-exercise binding** — how the contract journeys start your app before
-driving it. A contract that names an `api:` surface is worthless if nothing knows how to boot the
-API.
+`boot_command` is **declarative metadata today** — it records how this repo is booted, and the
+schema accepts it, but no shipped code reads it. The recipe `/foundry:certify-local` actually
+boots comes from the **active stack profile's** `app_exercise_binding.boot`, not from here. Record
+it anyway so the manifest documents the repo honestly, but do not expect it to drive anything.
 
 ```bash
 /foundry:doctor   # → DOCTOR-GREEN, now as a multi-repo control plane
@@ -258,11 +276,20 @@ Two rules that keep this honest:
 - **One atom, one target repo.** A change spanning `api` and `infra` is *two* atoms with an
   explicit dependency, not one atom with two venues. It keeps each scope groundable and each
   merge floor meaningful.
-- **`scope.allowed_paths` grounds against the target repo**, not the control plane. If
-  `target_repo` is missing, those paths resolve against the control plane — where `src/` does not
-  exist — so every path matches nothing, and a scope that matches nothing constrains nothing.
-  Authorization refuses this, by design. If the gate rejects your scope with *"matches ZERO paths
-  under the venue root"*, the usual cause is a missing or misspelled `target_repo`.
+- **`scope.allowed_paths` grounds against the target repo**, not the control plane. The two ways
+  to get this wrong fail in **opposite** directions, which is worth knowing before it happens:
+  - **`target_repo` absent** → the paths ground against the control plane, where `src/` does not
+    exist, so the scope matches nothing — and a scope that matches nothing constrains nothing.
+    Authorization **refuses this, by design**: *"matches ZERO paths under the venue root"*.
+  - **`target_repo` present but unresolvable** (misspelled, or not cloned) → there is no venue
+    root to ground against, so authorization **degrades rather than refuses**. Five floors —
+    surface⊆scope, doctor-row baseline, system-grounding, `allowed_paths` grounding, and
+    checkpoint-locator grounding — each print a `warn: … degraded` / `SKIPPED` line and are
+    skipped, and the contract still freezes and still increments `auth_seq`.
+
+  The rationale for the second is sound (never wedge a freeze on a checkout you simply have not
+  made yet), but it means **a typo and a not-yet-cloned repo look identical**. Read the `warn:`
+  lines in the authorize dry-run before you confirm; an unexpected degrade is a manifest defect.
 
 ---
 
@@ -294,10 +321,11 @@ manifest, and hosted repos are untouched; the plugin is not in your tree.
 |---|---|
 | No `/foundry:*` verbs | Session started in a hosted repo, or the plugin is not installed. `cd` to the control plane. |
 | `DOCTOR-RED`, operator registry | `.claude/foundry-operators.json` still has `op_example`, or the id in a contract is not a key in it. |
-| `DOCTOR-RED`, a repo path | A `repos{}` entry names a directory you have not cloned. Clone it, or remove the entry. |
-| Authorization: *"matches ZERO paths under the venue root"* | Missing or wrong `target_repo` — the scope is grounding against the control plane instead of the code repo. |
+| A `repos{}` entry points at nothing | **The doctor will not tell you** — its five checks never read `repos{}`. The symptom appears at authorize time as `warn: … degraded` lines (see the row below). |
+| Authorize prints *"matches ZERO paths under the venue root"* | `target_repo` is **absent**, so the scope grounded against the control plane, where `src/` does not exist. Add the key. This one fails closed. |
+| Authorize prints several `warn: … degraded` / `SKIPPED` lines | `target_repo` is **present but unresolvable** — misspelled, or the repo is not cloned. Five grounding floors were skipped and the freeze proceeded anyway. Fix the manifest and re-authorize. |
 | The control plane wants to commit your app's files | The gitignore entry is missing or not root-anchored. Use `/api/`, not `api/`. |
-| Journeys cannot reach the app | `boot_command` missing or wrong in that repo's manifest entry. |
+| Journeys cannot reach the app | The **stack profile's** `app_exercise_binding.boot` is what certification boots — not `boot_command`. See the certification how-to. |
 
 ---
 

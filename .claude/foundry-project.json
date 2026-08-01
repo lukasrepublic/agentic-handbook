@@ -1,18 +1,19 @@
 {
   "schema_version": 1,
-  "//": "Foundry ADOPTER PROJECT INVENTORY + the meta-repo MANIFEST (the WHAT, workspace-side). Generic foundry/ primitives resolve project-specifics (repo paths, boot command, conventions, live-seam drivers) from HERE rather than hardcoding them. This is ALSO the multi-repo control-center manifest: to host an infra/service repo as a gitignored sibling subdir, add it under repos{} keyed by a target_repo dispatch key — see docs/SETUP.md 'Multi-repo control center'. Seeded self-only (path '.') so a fresh, un-populated workspace stays DOCTOR-GREEN; add hosted entries live, only once the repo is cloned. Captured + updated by /foundry:init. Sibling of .claude/foundry-operators.json (identity). RULE: never bake a project-specific value into a foundry/ primitive — reference this file by key.",
+  "//": "Foundry ADOPTER PROJECT INVENTORY + the meta-repo MANIFEST (the WHAT, workspace-side). Generic foundry/ primitives resolve project-specifics (repo paths, boot command, conventions, live-seam drivers) from HERE rather than hardcoding them. This is ALSO the multi-repo control-plane manifest: to host an infra/service repo as a gitignored sibling subdir, add it under repos{} keyed by a target_repo dispatch key — see docs/control-plane.md (the operating model) and docs/SETUP.md 'Multi-repo control plane' (the add-a-repo runbook). Seeded self-only (path '.'), the single-repo default. Captured + updated by /foundry:init. Sibling of .claude/foundry-operators.json (identity). RULE: never bake a project-specific value into a foundry/ primitive — reference this file by key.",
   "project": {
     "name": "REPLACE-ME",
     "workspace_repo": "REPLACE-ME-handbook",
-    "description": "REPLACE-ME — one line: what this project is, who it's for. (This workspace is the control center; the product/infra repos it builds are hosted as gitignored siblings, see repos{} + docs/SETUP.md.)"
+    "description": "REPLACE-ME — one line: what this project is, who it's for. (This workspace is the control plane; the product/infra repos it builds are hosted as gitignored siblings, see repos{} + docs/control-plane.md.)"
   },
   "repos": {
+    "//": "ADD AN ENTRY ONLY ONCE THE REPO IS CLONED. Nothing validates repos{} today — /foundry:doctor's five checks do not read it — and a dangling entry does not fail loudly later: it makes /foundry:authorize skip five grounding floors with a printed 'warn: ... degraded' line and freeze the contract anyway. See docs/control-plane.md section 4.",
     "workspace": {
       "path": ".",
       "kind": "workspace",
-      "role": "the control center itself (the WHAT — specs, governance, the manifest). Self entry: resolves to the workspace root, so the doctor treats this as a single-repo adopter until a hosted repo is added."
+      "role": "the control plane itself (the WHAT — specs, governance, the manifest). Self entry: resolves to the workspace root. This alone is the single-repo default — a contract with no target_repo is workspace-targeted."
     },
-    "//hosted-repo-example": "To host an infra/service repo, add a sibling entry once you've cloned it into the gitignored subdir, e.g.: \"infra\": { \"path\": \"infra\", \"kind\": \"infra-repo\", \"role\": \"the project's IaC (OpenTofu/Kubernetes)\" }. The key is the target_repo dispatch key. Runbook: docs/SETUP.md 'Multi-repo control center'."
+    "//hosted-repo-example": "To host an infra/service repo, add a sibling entry once you've cloned it into the gitignored subdir, e.g.: \"infra\": { \"path\": \"infra\", \"kind\": \"infra-repo\", \"role\": \"the project's IaC (OpenTofu/Kubernetes)\" }. The key is the target_repo dispatch key. Runbook: docs/SETUP.md 'Multi-repo control plane'."
   },
   "conventions": {
     "citation_prefix": "Doc",
@@ -23,6 +24,6 @@
     "branch_prefix": "<agent-name>/<atom>"
   },
   "surfaces": {
-    "//": "§22.4b app-exercise binding: surface kind -> how a live-seam human-equivalent walk exercises it (the generic analog of 'make dev + Chrome MCP'). /foundry:init captures this for your app; /foundry:doctor fail-closes if a code-profile contract declares a surface with no usable driver here."
+    "//": "App-exercise binding: surface kind -> how a live-seam human-equivalent walk exercises it (the generic analog of 'make dev + Chrome MCP'). /foundry:init captures this for your app. NOTE: this block is declarative today — no shipped check reads it. The boot recipe /foundry:certify-local actually uses comes from the active stack profile's app_exercise_binding.boot."
   }
 }

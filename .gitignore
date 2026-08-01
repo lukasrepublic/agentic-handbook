@@ -1,10 +1,10 @@
-# ── hosted repos (the meta-repo control-center convention) ──────────────────
-# This workspace is a CONTROL CENTER: it may host the project's infra + service
+# ── hosted repos (the meta-repo control-plane convention) ───────────────────
+# This workspace is a CONTROL PLANE: it may host the project's infra + service
 # repos as INDEPENDENT, gitignored sibling subdirs (the meta-repo pattern), each
 # tracked by .claude/foundry-project.json repos{} — NOT as git submodules. Anchor
 # every hosted repo to the repo root with a leading slash so it is never tracked
-# by the control center, and add a matching repos{} entry. Runbook + the rationale
-# (why siblings, not submodules): docs/SETUP.md 'Multi-repo control center'.
+# by the control plane, and add a matching repos{} entry. Runbook + the rationale
+# (why siblings, not submodules): docs/SETUP.md 'Multi-repo control plane'.
 #   /infra/          # example: your IaC repo (OpenTofu/Kubernetes) — uncomment when cloned
 #   /<your-repo>/    # one line per hosted repo, root-anchored
 # ────────────────────────────────────────────────────────────────────────────

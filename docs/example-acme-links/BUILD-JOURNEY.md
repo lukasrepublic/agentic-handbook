@@ -145,9 +145,9 @@ The link between them is one entry in `.claude/foundry-project.json`:
 }
 ```
 
-`boot_command` is the **app-exercise binding** — the recipe the contract journeys boot before
-driving the app. A contract that names an `api:` surface is worthless if nothing knows how to
-start the API.
+`boot_command` records how this repo boots. Note honestly: no shipped code reads that field today
+— `/foundry:certify-local` resolves its boot recipe from the active **stack profile's**
+`app_exercise_binding.boot`. The field documents the repo; it does not yet drive it.
 
 Each contract then names its venue:
 
