@@ -1,8 +1,12 @@
 # Agentic Handbook — workspace template
 
-A starter **workspace** for an agentic software project. Click **"Use this template"** to
-create your project's workspace, then wire in the [**Agentic Foundry**](https://github.com/lukasrepublic/agentic-foundry)
+A starter **workspace** for an agentic software project — and the **control plane** for however
+many code repositories that project has. Click **"Use this template"** to create your project's
+workspace, then wire in the [**Agentic Foundry**](https://github.com/lukasrepublic/agentic-foundry)
 plugin (the factory).
+
+Your specs live here. Your code lives in its own repos, hosted inside this one as gitignored
+siblings, and the factory dispatches work into each — see [Layout](#layout--one-workspace-n-repos).
 
 ## The model: Workspace (WHAT) + Factory (HOW)
 
@@ -81,17 +85,59 @@ both when you no longer need them. What is *yours* is described in
 Two hard gates (authorize, the floor), one honest tail (certify, sign-off). The full
 orchestration + artifact registry: [`WORKFLOW.md`](WORKFLOW.md).
 
-## Layout
+## Layout — one workspace, N repos
+
+**This workspace is a control plane.** Your specs live here; your *code* lives in its own
+repositories, which sit inside this tree as **gitignored siblings** — each one an independent git
+repo with its own history, PRs, CI and merge floor. The factory dispatches work *into* them.
 
 ```
-specs/features/<product>/<domain>/<capability>/   atomic specs + acceptance-contract.yaml
-specs/releases/ · specs/lifecycle/                release manifests + lifecycle views
-context/                                          spec templates + the citation grammar + glossary
-docs/architecture/                                architecture docs + ADRs
-status-reports/                                   executive status reports
-.claude/foundry-operators.json                    operator registry (the factory reads this)
-CLAUDE.md · WORKFLOW.md                            workspace governance + the SDLC orchestration
+<project>-handbook/                      ◀── git repo #1 — the workspace. YOU commit this one.
+│
+├── CLAUDE.md · WORKFLOW.md                  governance + the SDLC pipeline
+├── .claude/
+│   ├── settings.json                        the wiring (enabledPlugins → the factory)
+│   ├── foundry-operators.json               who is allowed to authorize
+│   └── foundry-project.json   ◀── THE MANIFEST. repos{} maps a dispatch key → a path below.
+├── specs/
+│   ├── features/<product>/…                 the WHAT: feat-*.md + acceptance-contract.yaml
+│   └── releases/ · lifecycle/               release manifests + generated lifecycle views
+├── docs/ · status-reports/ · context/
+├── .gitignore                 ◀── every hosted repo below is listed here, root-anchored (/api/)
+│
+├── api/                                 ◀── git repo #2 — GITIGNORED. Not a submodule.
+│   ├── .git/                                its own history, branches, PRs, CI, merge floor
+│   ├── src/…                                the HOW-built: your application code
+│   └── .foundry/build-provenance.yaml       pins the repo-#1 commit that authorized this atom
+│
+└── infra/                               ◀── git repo #3 — GITIGNORED. Same deal.
+    ├── .git/
+    └── terraform/… or k8s/…
 ```
+
+Three git repositories, one directory tree. The boundaries are the point:
+
+- **`git status` here never shows anything from `api/` or `infra/`** — root-anchored gitignore
+  entries, so the control plane cannot accidentally commit your app.
+- **Each hosted repo keeps a fully independent history.** No submodule pointer, no entangled
+  histories, no `git submodule update`.
+- **The link runs the other way.** Each built atom writes `.foundry/build-provenance.yaml` *in the
+  code repo*, pinning the workspace commit whose frozen contract authorized it — traceability
+  without coupling.
+- **The factory is not in this tree.** The plugin installs under `~/.claude/plugins/…`; upgrading
+  it touches nothing above.
+
+A spec reaches a repo by naming its manifest key:
+
+```
+   acceptance-contract.yaml            .claude/foundry-project.json          on disk
+   ───────────────────────             ───────────────────────────          ───────
+   target_repo: api          ─────►    repos.api.path = "api"        ─────►   ./api/
+```
+
+**Starting with one repo?** That is the default — a fresh template seeds only the `workspace`
+self-entry, a contract with no `target_repo` is workspace-targeted, and `/foundry:doctor` stays
+green. Add hosted repos when you have them: **[`docs/SETUP.md` → Multi-repo control plane](docs/SETUP.md#multi-repo-control-plane--hosting-your-code-repos)**.
 
 ## License
 

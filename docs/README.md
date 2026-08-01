@@ -17,7 +17,8 @@ Two kinds of document live here, and it is worth knowing which you are reading:
 
 | Document | What it is |
 |---|---|
-| [`SETUP.md`](SETUP.md) | Anatomy of an initialized workspace + the setup runbook (greenfield and existing-repo), identity isolation, and the multi-repo control-center pattern. |
+| [`SETUP.md`](SETUP.md) | Anatomy of an initialized workspace + the setup runbook (greenfield and existing-repo), and identity isolation. |
+| [`SETUP.md` → **Multi-repo control plane**](SETUP.md#multi-repo-control-plane--hosting-your-code-repos) | **How the nested-repo structure works and how to add one.** The workspace hosts your code repos as gitignored siblings — each an independent git repo the factory dispatches into. Diagram of the on-disk layout, the `target_repo` → manifest → directory mapping, why siblings rather than submodules, and the add-a-repo runbook. |
 | [`architecture/`](architecture/) | Your project's architecture docs and ADRs. Ships mostly empty — it is yours to fill. |
 | [`../CLAUDE.md`](../CLAUDE.md) | Workspace governance: the floor that never relaxes, stage mode, conventions. |
 | [`../WORKFLOW.md`](../WORKFLOW.md) | The SDLC orchestration — the phase pipeline and the artifact registry. |

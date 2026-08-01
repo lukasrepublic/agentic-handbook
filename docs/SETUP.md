@@ -226,10 +226,72 @@ Different jobs — see architecture.md §3.
 
 ---
 
-## Multi-repo control center — hosting infra + service repos
+## Multi-repo control plane — hosting your code repos
 
 This workspace can be a **control center** that hosts the project's *other* repos — its
 infrastructure (IaC) repo, service repos, any number — and drives the factory into each.
+
+### What it looks like on disk
+
+**Three git repositories, one directory tree.** That is the whole idea, and it is the part prose
+keeps failing to convey:
+
+```
+<project>-handbook/                      ◀── git repo #1 — the workspace. YOU commit this one.
+│
+├── CLAUDE.md · WORKFLOW.md                  governance + the SDLC pipeline
+├── .claude/
+│   ├── settings.json                        the wiring (enabledPlugins → the factory)
+│   ├── foundry-operators.json               who is allowed to authorize
+│   └── foundry-project.json   ◀── THE MANIFEST. repos{} maps a dispatch key → a path below.
+├── specs/features/<product>/…               the WHAT: feat-*.md + acceptance-contract.yaml
+├── docs/ · status-reports/
+├── .gitignore                 ◀── every hosted repo below is listed here, root-anchored (/infra/)
+│
+├── acme-links/                          ◀── git repo #2 — GITIGNORED. Not a submodule.
+│   ├── .git/                                its own history, branches, PRs, CI, merge floor
+│   ├── src/…                                the HOW-built: the actual application code
+│   └── .foundry/build-provenance.yaml       pins the repo-#1 commit it was authorized against
+│
+└── infra/                               ◀── git repo #3 — GITIGNORED. Same deal.
+    ├── .git/
+    └── terraform/… or k8s/…
+```
+
+Read the boundaries, because they are what make this work:
+
+- **`git status` in the workspace never shows anything from `acme-links/` or `infra/`.** They are
+  root-anchored gitignore entries. The control center cannot accidentally commit your app.
+- **Each hosted repo keeps a fully independent history** — its own PRs, its own CI, its own
+  branch protection. The workspace is never pinned to a submodule commit pointer.
+- **The link runs the other way.** Rather than the workspace tracking the code, each built atom
+  writes `.foundry/build-provenance.yaml` *in the code repo*, pinning the workspace commit whose
+  frozen contract authorized it. Traceability without coupling.
+- **The factory is not in this tree at all.** The plugin installs under `~/.claude/plugins/…` and
+  resolves via `${CLAUDE_PLUGIN_ROOT}`; it reads your corpus via `CLAUDE_PROJECT_DIR`. Upgrading
+  the factory touches nothing above.
+
+The manifest is what ties a spec to a directory:
+
+```jsonc
+// .claude/foundry-project.json
+"repos": {
+  "workspace":  { "path": ".",           "kind": "workspace" },
+  "app":        { "path": "acme-links",  "kind": "single-app", "boot_command": "make dev" },
+  "infra":      { "path": "infra",       "kind": "infra-repo" }
+}
+```
+
+```
+   acceptance-contract.yaml            .claude/foundry-project.json         on disk
+   ───────────────────────             ───────────────────────────         ───────
+   target_repo: app          ─────►    repos.app.path = "acme-links"  ─────►  ./acme-links/
+```
+
+A contract with **no** `target_repo` is workspace-targeted — the single-repo default. A contract
+naming a key whose directory is missing fails closed at authorization: the gate refuses a scope
+whose paths ground against nothing. (That is not hypothetical — it caught four contracts here
+whose `target_repo` was missing entirely, so every path in them matched zero files.)
 
 **The pattern (and why this one).** This is the **meta-repo** pattern: the hosted repos live as
 **independent, gitignored sibling subdirs**, named by a **manifest** — here,
