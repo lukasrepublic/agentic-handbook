@@ -294,9 +294,27 @@ The manifest is what ties a spec to a directory:
 ```
 
 A contract with **no** `target_repo` is workspace-targeted — the single-repo default. A contract
-naming a key whose directory is missing fails closed at authorization: the gate refuses a scope
-whose paths ground against nothing. (That is not hypothetical — it caught four contracts here
-whose `target_repo` was missing entirely, so every path in them matched zero files.)
+naming a `target_repo` key follows two distinct dispositions, and they must not be confused:
+
+- **Key absent** → the scope grounds against the control plane itself, where the target repo's
+  files do not exist, so it `matches ZERO paths` under the venue root. Authorization **refuses**,
+  by design. (That is not hypothetical — it caught four contracts here whose `target_repo` was
+  missing entirely, so every path in them matched zero files.)
+- **Key present but unresolvable** (misspelled, or a repo not yet cloned) → there is no venue
+  root to ground against, so authorization `degrades rather than refuses`: five grounding floors —
+  surface⊆scope, doctor-row baseline, system-grounding, `allowed_paths` grounding, and
+  checkpoint-locator grounding — each print a `warn: … degraded` / `SKIPPED` line and are
+  skipped, and the contract still freezes and still increments `auth_seq`.
+
+**Nothing catches the second case before authorize time by itself.**
+`feat-foundry-control-plane-preflight` — was specified, not shipped, at spec-authoring time
+(2026-08-01/02); it has since shipped as `/foundry:doctor`'s sixth probe in agentic-foundry
+v1.1.0 (2026-08-02). It is an operator-invoked doctor check, not an authorization gate: it
+convicts a dangling `repos{}` path when an operator runs `/foundry:doctor`, keeps that
+command's `--session-start` fail-open contract, and does not change the authorize-time
+five-floor degradation above. Read the `warn:` lines in the authorize dry-run before you
+confirm — register only repos you have already cloned. This coverage on the degraded path
+is a practice, not a control: no gate, hook or CI job asserts either happened.
 
 **The pattern (and why this one).** This is the **meta-repo** pattern: the hosted repos live as
 **independent, gitignored sibling subdirs**, named by a **manifest** — here,
@@ -312,21 +330,25 @@ established lightweight multi-repo convention, e.g. the `meta` tool.)
 workspace-targeted, and there is nothing to configure until you clone a second repo in.
 
 > **Add hosted repos only once cloned — never as dangling entries, and check your spelling.**
-> This matters more than it looks, and nothing currently catches it for you:
-> `/foundry:doctor`'s five checks (plugin manifest, hooks, skill frontmatter, stack-profile lock,
-> operator registry) **do not read `repos{}` at all**, so a dangling entry stays `DOCTOR-GREEN`.
+> `/foundry:doctor`'s sixth probe (`feat-foundry-control-plane-preflight`, shipped in
+> agentic-foundry v1.1.0) now catches a dangling `repos{}` entry: run `/foundry:doctor` after
+> every manifest edit and a dangling entry turns `DOCTOR-RED`, naming the offending key. It is an
+> operator-invoked check, not an authorization gate — it only fires when you actually run
+> doctor, and `--session-start` fails open (a warning only, the session still continues).
 >
-> The cost lands at authorization. When a contract's `target_repo` does not resolve to a real
-> directory — a typo, or a repo you have not cloned yet — `/foundry:authorize` cannot establish a
-> venue root, and **five grounding floors degrade to warnings and the freeze proceeds anyway**:
-> the surface⊆scope check, the doctor-row baseline check, the system-grounding floor, the
-> `allowed_paths` reality-grounding check, and checkpoint-locator grounding. Each prints a
-> `warn: … degraded` / `SKIPPED` line, so the information is on screen — but a typo and a
-> not-yet-cloned repo look identical, and the contract still freezes and still increments
-> `auth_seq`.
+> The cost still lands at authorization if you skip that step. When a contract's `target_repo`
+> does not resolve to a real directory — a typo, or a repo you have not cloned yet —
+> `/foundry:authorize` cannot establish a venue root, and **five grounding floors degrade to
+> warnings and the freeze proceeds anyway**: the surface⊆scope check, the doctor-row baseline
+> check, the system-grounding floor, the `allowed_paths` reality-grounding check, and
+> checkpoint-locator grounding. Each prints a `warn: … degraded` / `SKIPPED` line, so the
+> information is on screen — but a typo and a not-yet-cloned repo look identical, and the
+> contract still freezes and still increments `auth_seq`.
 >
 > **Read the `warn:` lines in the authorize dry-run before you confirm.** If you did not expect a
-> degrade, you have a manifest defect, not a missing checkout.
+> degrade, you have a manifest defect, not a missing checkout. Doing both — running doctor after
+> every edit, reading the `warn:` lines before every freeze — is a practice, not a control: no
+> gate, hook or CI job asserts either happened.
 
 ### Add a hosted repo (runbook)
 
@@ -338,14 +360,20 @@ workspace-targeted, and there is nothing to configure until you clone a second r
    git clone git@github.com:<you>/<project>-infra.git infra
    ```
 2. **Register it in the manifest** — add one `repos.<key>` entry. The **key is the `target_repo`
-   dispatch key**; the shape is exactly what the resolver reads (`repos.<key>.path`):
+   dispatch key**; the shape is exactly what the resolver reads (`repos.<key>.path`). Not every
+   field you can record here is read by shipped code — see `control-plane.md` →
+   *What the manifest fields actually do* for which of the seven fields are and are not:
    ```json
    "repos": {
      "workspace": { "path": ".", "kind": "workspace", "role": "the control plane" },
      "infra":     { "path": "infra", "kind": "infra-repo", "role": "the project's IaC (OpenTofu/Kubernetes)" }
    }
    ```
-   With the cloned dir present on disk, the path resolves → the workspace stays `DOCTOR-GREEN`.
+   With the cloned dir present on disk, the path resolves and `/foundry:doctor` stays
+   `DOCTOR-GREEN`. That green attests the wiring, not the registration — the doctor's checks
+   never used to read `repos{}` at all, and even now, its sixth probe only checks that the path
+   resolves; it does not check the key name a contract will actually reference, or any other
+   field. See the callout above for the full mechanism and its tier.
 3. **Provenance rides the dispatch — nothing to pin at clone time.** The cross-repo
    `.foundry/build-provenance.yaml` marker (pinning the workspace commit an atom was authorized
    against) is authored as part of the dispatched atom's PR, per the provenance convention the
