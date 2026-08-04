@@ -36,7 +36,7 @@ jobs:
           PY
       - name: Identity-guard selftest (shipped, hermetic)
         run: bash .claude/hooks/gh-account-guard.selftest.sh
-      - name: Install pin is consistent and current (anti-drift)
+      - name: Install pins are consistent across the tree (anti-drift)
         # WHY THIS EXISTS: docs/control-plane.md sat at #v1.0.0 while the shipped plugin was
         # v1.2.0 — two minor versions stale, unnoticed, because nothing checked. The foundry repo
         # has two whole-tree scanners that make exactly this impossible; the handbook had none, so
