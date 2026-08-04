@@ -18,3 +18,10 @@ __pycache__/
 .claude/settings.local.json
 .foundry/session-learnings/
 .foundry/session-markers/
+# FOUNDRY-RUNTIME-GITIGNORE-BEGIN (managed by scripts/foundry-apply-runtime-gitignore.sh -- do not edit by hand)
+# .foundry/ runtime partitions are ignored by default; the designed-tracked set is re-included.
+/.foundry/*
+!/.foundry/README.md
+!/.foundry/build-provenance.yaml
+!/.foundry/stack-profile.lock
+# FOUNDRY-RUNTIME-GITIGNORE-END (re-run the applier to converge; do not edit by hand)

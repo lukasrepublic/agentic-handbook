@@ -40,7 +40,7 @@ is built without it.
 | 0–1 | LLM-friendly functional spec (AC-IDs, normative region) | same file (the `<!-- normative -->` region) |
 | 1 | review evidence | `.foundry/` (runtime, gitignored) — the review is content-bound to the spec's hash |
 | 2 | frozen acceptance contract | `…/acceptance-contract.yaml` (operator-signed `authorized:` block) |
-| 3 | release manifest | `.foundry/releases/<id>/release.yaml` (`<id>` is an `[a-z0-9-]+` slug — the factory resolves this exact path) |
+| 3 | release manifest | `.foundry/releases/<id>/release.yaml` (`<id>` is an `[a-z0-9-]+` slug — the factory resolves this exact path; a manifest anywhere else is never found). Companions alongside it: `specs.txt`, `dependency-graph.md`, `release-notes.md` |
 | — | lifecycle views (generated) | `specs/lifecycle/<state>/manifest.yaml` — never hand-edited |
 | 4 | the PR + its checks | the code repo (the PR body carries `Spec: <path>` — the spec-link) |
 | 4 | build-provenance | in the **code repo** (`.foundry/build-provenance.yaml`, pins this workspace's commit) |
@@ -48,6 +48,10 @@ is built without it.
 | 7 | the operator's acceptance | the release manifest (a practice note) |
 | — | architecture / ADRs | `docs/architecture/` |
 | 7–8 | learnings / status | `status-reports/`, the distill corpus |
+
+> **Atoms are authorized per-atom — "authorize the release once" is not a thing.** Each atom carries
+> its own frozen `acceptance-contract.yaml` from phase 2. `/foundry:authorize-release` records the
+> operator go-ahead for shipping a *wave*; it is not a substitute for the per-atom freeze.
 
 ## The WHAT ladder (refinement of intent)
 
