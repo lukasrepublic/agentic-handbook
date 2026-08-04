@@ -38,9 +38,10 @@ from** — the thing that's otherwise only learnable by reverse-engineering an e
 ├── WORKFLOW.md                        [T]    SDLC orchestration + artifact registry
 ├── README.md                          [T]    template readme (retarget to your project when ready)
 ├── .claude/
-│   ├── settings.json                  [B]    THE WIRING: the permission floor + enabledPlugins/extraKnownMarketplaces
-│   │                                         (+ the template's hooks). Written by the pre-session bootstrap (§3);
-│   │                                         /foundry:init VERIFIES it and never writes it.
+│   ├── settings.json                  [T→B]  THE WIRING: the permission floor + enabledPlugins/extraKnownMarketplaces
+│   │                                         (+ the template's hooks). The template ships only enabledPlugins + hooks —
+│   │                                         the pre-session bootstrap (§3) adds the permission floor, so cloning the
+│   │                                         template ALONE leaves you without one. /foundry:init VERIFIES, never writes.
 │   ├── foundry-operators.json         [T→I]  operator registry — replace op_example with your real operator id(s)
 │   ├── settings.local.json            [I,G]  machine-local resolved paths (e.g. absolute gh config dir)
 │   └── logs/                          [G]    session logs
