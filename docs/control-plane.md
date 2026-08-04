@@ -139,7 +139,7 @@ Everything from here happens **in this directory**.
 ### Step 2 — install the factory and declare yourself
 
 ```bash
-claude plugin marketplace add lukasrepublic/agentic-foundry#v1.0.0
+claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.0
 claude plugin install foundry@agentic-foundry
 ```
 
