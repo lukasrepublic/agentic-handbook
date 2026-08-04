@@ -100,9 +100,14 @@ Either way, a session started inside a hosted repo is not "the factory with a na
 a session **with none of your governance**, and it will let an agent write code that no frozen
 contract authorized.
 
-> **Nothing detects this today.** A preflight check is specified
-> (`feat-foundry-control-plane-preflight`) and will convict the user-wide case, where the doctor is
-> reachable. Until it ships, the rule above is the only defence.
+> **A preflight check now detects the user-wide case.** `/foundry:doctor`'s sixth probe
+> (`feat-foundry-control-plane-preflight`, shipped in agentic-foundry v1.1.0) is
+> an operator-invoked doctor check, not an authorization gate: it convicts a session rooted in
+> the wrong place — or a dangling `repos{}` entry — only when an operator runs `/foundry:doctor`,
+> keeps that command's `--session-start` fail-open contract (a warning only; the session still
+> continues), and does not change the authorize-time five-floor degradation described in §4. The
+> rule above — always start at the control plane — remains the practice that prevents the
+> mistake in the first place, not something a gate enforces for you.
 
 **You still work on code in the hosted repos** — the factory dispatches workers into those
 working trees for you, and each repo's own PR and merge floor govern what lands. You just drive
@@ -143,6 +148,16 @@ claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.0
 claude plugin install foundry@agentic-foundry
 ```
 
+> **Pin the released tag, not a moving target.** This guide has gone stale twice — pinned
+> `v1.0.1` when `v1.1.0` shipped, then `v1.1.0` when `v1.2.0` did. Check the plugin's own
+> `CHANGELOG.md` for the current release before you install.
+>
+> **This is now checked.** `workspace-floor` fails when the documented install pins disagree across
+> the tree, so bumping the plugin is a single edit that must touch every install line together — a
+> half-done bump is a red check rather than a discovery two releases later. The check asserts
+> internal consistency; it cannot know the plugin's current version (separate repo), so keeping the
+> pin *current* is still yours — it only guarantees you cannot leave it *inconsistent*.
+
 Edit `.claude/foundry-operators.json` — replace the example with your real id. This is
 load-bearing, not paperwork: every frozen contract names an `operator_id`, and the freeze
 fail-closes if the id does not resolve here.
@@ -168,12 +183,17 @@ claude          # from acme-handbook/
 A fresh template is **single-repo**: the seeded `repos{}` has only the `workspace` self-entry, and
 that is a valid, green state.
 
-**Do not add manifest entries for repos you have not cloned yet.** A dangling entry is not caught
-by anything today — the doctor's five checks do not read `repos{}` — and it does not fail loudly
-later either: it makes `/foundry:authorize` skip five of its grounding floors with a printed
-warning and freeze the contract anyway (§4). A check that convicts a dangling entry is queued as
-`feat-foundry-control-plane-preflight`; until it ships, adding entries only for repos that exist
-is the defence.
+**Do not add manifest entries for repos you have not cloned yet.** A dangling entry now surfaces
+at doctor time too: `/foundry:doctor`'s sixth probe (`feat-foundry-control-plane-preflight`,
+shipped in agentic-foundry v1.1.0) reads `repos{}` and reports any entry whose path does not
+resolve.
+
+It is an operator-invoked doctor check, not an authorization gate: it convicts only at doctor
+time, keeps `--session-start`'s fail-open contract, and leaves the authorize-time floors below
+unchanged — an unresolved `target_repo` still skips five grounding floors and freezes anyway
+(§4).
+
+Adding entries only for repos that exist remains the practice that avoids tripping either check.
 
 ### Step 4 — bring in your first code repo
 
@@ -204,14 +224,42 @@ will name:
 }
 ```
 
-`boot_command` is **declarative metadata today** — it records how this repo is booted, and the
-schema accepts it, but no shipped code reads it. The recipe `/foundry:certify-local` actually
-boots comes from the **active stack profile's** `app_exercise_binding.boot`, not from here. Record
-it anyway so the manifest documents the repo honestly, but do not expect it to drive anything.
+#### What the manifest fields actually do
+
+Two tiers, and every `repos.<key>` field above is one or the other:
+
+- **`read by shipped code`** — the label names what reads it; the field's value changes what a
+  shipped script actually does.
+- **`declarative metadata today`** — the schema accepts the field (permissive
+  `additionalProperties: true`) and recording it documents the repo honestly, but no shipped
+  code reads it.
+
+| Field | Tier | What reads it |
+|---|---|---|
+| `path` | `read by shipped code` | the dispatch resolver (`foundry_release._resolve_key`, `scripts/foundry-wt resolve`) |
+| `boot_command` | `read by shipped code` | `certify-local`'s boot-recipe resolution — first precedence over the active stack profile's `app_exercise_binding.boot` (`feat-foundry-boot-recipe-precedence`, shipped in agentic-foundry v1.1.0) |
+| `kind` | `declarative metadata today` | nothing shipped |
+| `role` | `declarative metadata today` | nothing shipped (not declared at this level by the schema; accepted via `additionalProperties`) |
+| `package_manager` | `declarative metadata today` | nothing shipped |
+| `ci_install` | `declarative metadata today` | nothing shipped |
+| `datastores` | `declarative metadata today` | nothing shipped |
+
+`boot_command` used to be purely declarative; as of agentic-foundry v1.1.0 it is the
+**first-precedence** boot recipe — declare it and `certify-local` boots from it directly, no
+`.foundry/stack-profile.lock` required. The active stack profile's `app_exercise_binding.boot`
+remains the fallback, unchanged, when the project declares nothing usable. The other five fields
+above are still `declarative metadata today` — record them for the reader, not the machine.
 
 ```bash
 /foundry:doctor   # → DOCTOR-GREEN, now as a multi-repo control plane
 ```
+
+That green attests the wiring, not the registration — `/foundry:doctor`'s checks never used to
+read `repos{}` at all, and its new sixth probe is still narrow: it confirms the `path` above
+resolves to an existing directory, nothing more. It does not confirm the key name is what a
+contract's `target_repo` will actually reference, or that `kind`, `role`, `boot_command`, or any
+other field is correct. A mistake outside that one narrow check still surfaces only later, at
+authorize time (§4).
 
 ### Step 5 — repeat for every other repo
 
@@ -230,8 +278,16 @@ git clone git@github.com:<you>/acme-infra.git infra
 "infra": { "path": "infra", "kind": "infra-repo", "role": "OpenTofu + Kubernetes" }
 ```
 
-Re-run `/foundry:doctor` after each. Registering repos one at a time means a typo is obvious
-immediately rather than three repos later.
+Re-run `/foundry:doctor` after each — a green result attests the wiring, not the registration.
+As of agentic-foundry v1.1.0, `/foundry:doctor`'s sixth probe does catch an uncloned or
+mistyped `path` in an entry you already added — that surfaces at doctor time now, `DOCTOR-RED`,
+naming the key. What it cannot catch: a `repos{}` **key name** that does not match what a
+contract's `target_repo` will later reference — that mismatch surfaces only at authorize time,
+as the degraded `warn:` / `SKIPPED` lines described above (§4), because doctor only validates
+entries that exist, not the strings your contracts will use.
+
+The remedy: register only repos you have already cloned, and read those `warn:` lines in the
+authorize dry-run before you confirm — a practice, not a control.
 
 ### Step 6 — give each code repo a merge floor
 
@@ -296,7 +352,8 @@ Two rules that keep this honest:
 ## 5. Day-two operations
 
 **Adding a repo later** — same three moves as Step 4, in the same order: gitignore, clone,
-register, then `/foundry:doctor`.
+register, then `/foundry:doctor`. As Step 4 says: that green attests the wiring, not the
+registration.
 
 **Removing one** — delete the `repos{}` entry, remove the gitignore line, delete the directory.
 Specs that named it stay valid history; they simply cannot be dispatched until the key resolves
@@ -321,11 +378,11 @@ manifest, and hosted repos are untouched; the plugin is not in your tree.
 |---|---|
 | No `/foundry:*` verbs | Session started in a hosted repo, or the plugin is not installed. `cd` to the control plane. |
 | `DOCTOR-RED`, operator registry | `.claude/foundry-operators.json` still has `op_example`, or the id in a contract is not a key in it. |
-| A `repos{}` entry points at nothing | **The doctor will not tell you** — its five checks never read `repos{}`. The symptom appears at authorize time as `warn: … degraded` lines (see the row below). |
+| A `repos{}` entry points at nothing | **`/foundry:doctor` catches a bad `path` now** — its sixth probe reads `repos{}` and reports `DOCTOR-RED`, naming the key, but only if you actually run it (an operator-invoked check, not a gate). Skip that step, or the mismatch is a key name rather than a path, and it surfaces later, at authorize time, as `warn: … degraded` lines (see the row below). |
 | Authorize prints *"matches ZERO paths under the venue root"* | `target_repo` is **absent**, so the scope grounded against the control plane, where `src/` does not exist. Add the key. This one fails closed. |
 | Authorize prints several `warn: … degraded` / `SKIPPED` lines | `target_repo` is **present but unresolvable** — misspelled, or the repo is not cloned. Five grounding floors were skipped and the freeze proceeded anyway. Fix the manifest and re-authorize. |
 | The control plane wants to commit your app's files | The gitignore entry is missing or not root-anchored. Use `/api/`, not `api/`. |
-| Journeys cannot reach the app | The **stack profile's** `app_exercise_binding.boot` is what certification boots — not `boot_command`. See the certification how-to. |
+| Journeys cannot reach the app | Check `repos.<key>.boot_command` first — as of agentic-foundry v1.1.0 it is the **first-precedence** boot recipe; the **stack profile's** `app_exercise_binding.boot` is only the fallback when the manifest declares nothing usable. See the certification how-to. |
 
 ---
 
