@@ -144,14 +144,19 @@ Everything from here happens **in this directory**.
 ### Step 2 — install the factory and declare yourself
 
 ```bash
-claude plugin marketplace add lukasrepublic/agentic-foundry#v1.1.0
+claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.0
 claude plugin install foundry@agentic-foundry
 ```
 
-> **Pin the released tag, not a moving target.** This guide previously pinned
-> `agentic-foundry#v1.0.1`; that pin went stale the moment `v1.1.0` shipped (2026-08-02). Check
-> the plugin's own `CHANGELOG.md` for the current release before you install, and keep this pin
-> current here too — nothing in this repo's CI reconciles it automatically.
+> **Pin the released tag, not a moving target.** This guide has gone stale twice — pinned
+> `v1.0.1` when `v1.1.0` shipped, then `v1.1.0` when `v1.2.0` did. Check the plugin's own
+> `CHANGELOG.md` for the current release before you install.
+>
+> **This is now checked.** `workspace-floor` fails when the documented install pins disagree across
+> the tree, so bumping the plugin is a single edit that must touch every install line together — a
+> half-done bump is a red check rather than a discovery two releases later. The check asserts
+> internal consistency; it cannot know the plugin's current version (separate repo), so keeping the
+> pin *current* is still yours — it only guarantees you cannot leave it *inconsistent*.
 
 Edit `.claude/foundry-operators.json` — replace the example with your real id. This is
 load-bearing, not paperwork: every frozen contract names an `operator_id`, and the freeze
