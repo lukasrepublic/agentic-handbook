@@ -22,9 +22,15 @@ from** — the thing that's otherwise only learnable by reverse-engineering an e
 **Legend**
 `[T]` ships in this **template** ·
 `[P]` provided by the **plugin** (not in your repo — resolves under `${CLAUDE_PLUGIN_ROOT}`) ·
+`[B]` written by the **pre-session bootstrap** (`npx create-agentic-workspace`, §3) ·
 `[I]` created/edited by **`/foundry:init`** ·
 `[Y]` **yours** to fill in ·
 `[G]` **gitignored** runtime/transient
+
+> **`[B]` vs `[I]` is the distinction that changed.** `/foundry:init` no longer writes the
+> permission floor or the plugin/marketplace enablement — it **verifies and reports** them. A model
+> editing its own confinement is denied by the harness classifier, so those writes happen before a
+> session exists. See §3.
 
 ```
 <project>-handbook/
@@ -32,7 +38,9 @@ from** — the thing that's otherwise only learnable by reverse-engineering an e
 ├── WORKFLOW.md                        [T]    SDLC orchestration + artifact registry
 ├── README.md                          [T]    template readme (retarget to your project when ready)
 ├── .claude/
-│   ├── settings.json                  [T]    THE WIRING: enabledPlugins: { "foundry@agentic-foundry": true } (+ hooks)
+│   ├── settings.json                  [B]    THE WIRING: the permission floor + enabledPlugins/extraKnownMarketplaces
+│   │                                         (+ the template's hooks). Written by the pre-session bootstrap (§3);
+│   │                                         /foundry:init VERIFIES it and never writes it.
 │   ├── foundry-operators.json         [T→I]  operator registry — replace op_example with your real operator id(s)
 │   ├── settings.local.json            [I,G]  machine-local resolved paths (e.g. absolute gh config dir)
 │   └── logs/                          [G]    session logs
@@ -151,7 +159,41 @@ check the wiring (manifest, hooks, skills, profile lock, operator registry) in u
 
 ---
 
-## 3. Setup runbook — greenfield (start from this template)
+## 3. Before your first session — the pre-session bootstrap
+
+**The Claude Code session is a step, not the starting point.** This is the one part of setup that
+cannot happen inside a session, and the reason is structural rather than stylistic: a model editing
+its own confinement is denied by the harness classifier. So `/foundry:init` **can never scaffold its
+own permission floor** — the floor has to exist before a session does, written in your own terminal.
+
+```bash
+npx create-agentic-workspace
+```
+
+The wizard walks name/dir → greenfield-vs-existing → git/GitHub identity → stage mode → the
+permission conversation, previews every file **and** every capability it will declare before writing
+a byte, then writes and stops. It **declares, never grants**: it never runs `claude`, never accepts
+the workspace trust dialog, and never pre-grants anything. The platform's trust dialog — which lists
+exactly the rules it wrote — is the consent ceremony.
+
+What it owns, and `/foundry:init` therefore does not:
+
+| Artifact | Owner |
+|---|---|
+| `.claude/settings.json` — the three-tier permission floor | **pre-session CLI** |
+| `extraKnownMarketplaces` + `enabledPlugins` (plugin/marketplace enablement) | **pre-session CLI** |
+| Git commit-identity isolation (`--gh-account`, the `includeIf` wiring) | **pre-session CLI** |
+| Status line / native Bash sandbox settings | *no shipped writer* — init reports only |
+
+**Already have a workspace?** You do not need to re-onboard. `/foundry:init` still **verifies and
+reports** on all of the above — it simply never writes them. A finding tells you which artifact is
+missing and who owns the write.
+
+Then continue at §4 or §5 below, and open your session at the end of it — not the beginning.
+
+---
+
+## 4. Setup runbook — greenfield (start from this template)
 
 > **direnv users:** the template ships an `.envrc` (it exports identity variables when you
 > opt into the gh jail). direnv will prompt `blocked` on first entry — `direnv allow` when
@@ -162,32 +204,71 @@ check the wiring (manifest, hooks, skills, profile lock, operator registry) in u
 > it fail-closes. Either wire a first CI check before your first PR, or run that first
 > merge yourself in your own terminal. This is the guard working as designed.
 
-```bash
-# 1. Create your workspace from this template
-#    GitHub UI → "Use this template" → <project>-handbook   (or `gh repo create … --template`)
-git clone git@github.com:<you>/<project>-handbook.git && cd <project>-handbook
+**The whole journey, end to end.** Steps 0–2 run in **your own terminal**; the session opens at
+step 3. Nothing here needs a Claude Code session until it says so.
 
-# 2. Install the factory (the Foundry plugin)
-claude plugin marketplace add lukasrepublic/agentic-foundry
+```bash
+# ── 0. THE PERMISSION FLOOR — in your own terminal, before any session (§3) ──────────────
+#    Writes .claude/settings.json (the three-tier floor), the marketplace + plugin
+#    declarations, the git commit-identity wiring, and a seven-file workspace seed.
+#    It previews every file AND every capability before writing a byte, then stops.
+npx create-agentic-workspace
+cd <project>-handbook
+
+# ── 1. START FROM THIS TEMPLATE (optional — step 0 can also seed a fresh workspace) ──────
+#    GitHub UI → "Use this template" → <project>-handbook, or:
+gh repo create <you>/<project>-handbook --template lukasrepublic/agentic-handbook --public --clone
+cd <project>-handbook
+
+# ── 2. INSTALL THE FACTORY (the Foundry plugin) ──────────────────────────────────────────
+#    Pin the marketplace to a release tag — an unpinned add resolves the default branch.
+claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.0
 claude plugin install foundry@agentic-foundry
 
-# 3. Register yourself as operator
-#    edit .claude/foundry-operators.json → replace op_example with your id + GitHub handle
+#    Register yourself: edit .claude/foundry-operators.json → replace op_example with your
+#    operator id + GitHub handle. (/foundry:init will also seed this if you skip it.)
 ```
 
-> **Cross-account / private template — local-seed instead of `--template`.** "Use this template"
+Now open the session — **this is where the Claude Code part begins**:
+
+```
+# ── 3. ACCEPT THE TRUST DIALOG ───────────────────────────────────────────────────────────
+claude
+   → Claude Code shows the workspace trust dialog, listing exactly the `allow` rules
+     step 0 declared. THIS is the consent ceremony: the rules take effect only once you
+     accept it. `deny`/`ask` rules apply immediately (restrict-only is un-gated).
+
+# ── 4. INITIALIZE ────────────────────────────────────────────────────────────────────────
+/foundry:init
+   → WRITES:    the operator registry (.claude/foundry-operators.json), the stack-profile
+                lock (.foundry/stack-profile.lock, opt-in), and the .gitignore managed block.
+   → VERIFIES:  the permission floor, plugin/marketplace enablement, git commit identity,
+                the status line and the native Bash sandbox — it reports findings on these
+                and never writes them. A finding names the artifact and who owns the write.
+
+# ── 5. PROVE THE WIRING ──────────────────────────────────────────────────────────────────
+/foundry:doctor          # must print DOCTOR-GREEN before the workspace is "live"
+   → its permission-floor probe compares your written floor against the INSTALLED plugin's
+     own copy of the map — the one check that did not travel through npm.
+
+# ── 6. APPLY YOUR MERGE FLOOR ────────────────────────────────────────────────────────────
+   the plugin's scripts/foundry_tier_preflight.py reports your honest tier from
+   post-apply evidence (branch protection + required checks). Tier A enforces
+   server-side; Tier B reports only. Claim only the tier you actually have.
+```
+
+> **Cross-account or private template — local-seed instead of `--template`.** "Use this template"
 > and `gh repo create --template` require the **creating account to be able to read the template
-> repo**. If your template is **private** and owned by a *different* account or org than the new
-> repo's owner (a common multi-account setup), that call 403s and there is no cross-account
-> template clone. Seed from a local copy instead — tracked files only, no `.git`, no machine-local
-> cruft:
+> repo**. If your template is private and owned by a *different* account or org than the new repo's
+> owner (a multi-account setup), that call 403s and there is no cross-account template clone. Seed
+> from a local copy instead — tracked files only, no `.git`, no machine-local cruft:
 >
 > ```bash
 > # from a checkout of the template (the account that owns it):
 > git archive --format=tar HEAD | (mkdir -p /tmp/seed && tar -x -C /tmp/seed)
-> cd /tmp/seed && git init -q && git add -A && git commit -qm "seed from <template>@$(git -C - rev-parse --short HEAD 2>/dev/null || echo HEAD)"
+> cd /tmp/seed && git init -q && git add -A && git commit -qm "seed from <template>"
 >
-> # create the EMPTY private repo via the OWNING account's gh token (no --template):
+> # create the EMPTY repo via the OWNING account's gh token (no --template):
 > GH_CONFIG_DIR=$HOME/.config/gh-<account> gh repo create <owner>/<project>-handbook --private
 >
 > # push via the account's SSH host alias (see Identity isolation), NOT a github.com URL:
@@ -196,15 +277,6 @@ claude plugin install foundry@agentic-foundry
 >
 > Then continue at step 2 (install the factory) in the new repo.
 
-Then, inside a `claude` session in the repo:
-
-```
-4. /foundry:init      # seeds the operator registry + project config; then apply your merge
-                      #   floor (the plugin's scripts/foundry_tier_preflight.py — it reports
-                      #   your honest tier from post-apply evidence)
-5. /foundry:doctor    # must print DOCTOR-GREEN before the workspace is "live" 
-```
-
 Replace the placeholder paragraph at the top of `CLAUDE.md` with your project's description,
 and you're ready to author your first atom (see [Next](#5-next)).
 
@@ -212,17 +284,29 @@ and you're ready to author your first atom (see [Next](#5-next)).
 > steps 1–4 (scaffold → plugin install → optional identity jail → init → doctor). The steps
 > above are the same sequence, unrolled — use whichever you prefer.
 
-## 4. Setup runbook — existing repo (no template)
+## 5. Setup runbook — existing repo (already have one)
 
-You don't have to start from the template. In any repo:
+You don't have to start from the template. The order is the same: **the floor first, in your own
+terminal; the session second.**
+
+```bash
+# in your own terminal, at the repo root — scaffolds into an existing tree, never clobbering:
+npx create-agentic-workspace --dir . --existing
+```
+
+It creates only what is **absent**. A managed file that already exists and differs is reported
+`drifted` and **left byte-identical** — never overwritten, never merged. Then, in a session:
 
 ```
-/foundry:init    # wires plugin load + the operator registry + project config; verify with
-                 #   /foundry:doctor (DOCTOR-GREEN), then apply your merge floor (tier preflight)
+/foundry:init    # WRITES the operator registry, the stack-profile lock, the .gitignore block
+                 # VERIFIES (never writes) the permission floor, plugin/marketplace enablement,
+                 #   git identity, status line, sandbox — reporting a finding for each gap
+/foundry:doctor  # must print DOCTOR-GREEN, then apply your merge floor (tier preflight)
 ```
 
-`/foundry:init` does the **wiring**; the template provides the **workspace structure**.
-Different jobs — see architecture.md §3.
+The pre-session bootstrap does the **wiring**; `/foundry:init` **verifies** it and seeds the
+governance artifacts; the template provides the **workspace structure**. Three jobs — see
+architecture.md §3.
 
 ---
 
@@ -384,7 +468,7 @@ worker into the `infra/` working tree, and that repo's own merge floor admits th
 
 ---
 
-## 5. Next
+## 6. Next
 
 - **Author + authorize your first atom** → the plugin's
   [`QUICKSTART.md`](https://github.com/lukasrepublic/agentic-foundry/blob/main/docs/QUICKSTART.md)

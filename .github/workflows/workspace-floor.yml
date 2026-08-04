@@ -36,6 +36,39 @@ jobs:
           PY
       - name: Identity-guard selftest (shipped, hermetic)
         run: bash .claude/hooks/gh-account-guard.selftest.sh
+      - name: Install pin is consistent and current (anti-drift)
+        # WHY THIS EXISTS: docs/control-plane.md sat at #v1.0.0 while the shipped plugin was
+        # v1.2.0 — two minor versions stale, unnoticed, because nothing checked. The foundry repo
+        # has two whole-tree scanners that make exactly this impossible; the handbook had none, so
+        # fixing the literal alone would have left the mechanism that permitted the drift intact.
+        #
+        # The handbook cannot import the plugin's manifest (separate repo; the plugin resolves
+        # under ${CLAUDE_PLUGIN_ROOT} at runtime, not in this tree). So the invariant asserted here
+        # is INTERNAL CONSISTENCY: every documented `marketplace add …#vX.Y.Z` line across the whole
+        # tree names ONE version. Bumping the plugin therefore stays a single reviewed edit that
+        # touches every install line together, and a half-done bump is a red check.
+        #
+        # Whole-tree by `git ls-files`, never an enumerated list: a new doc naming the command
+        # joins the checked set automatically instead of silently escaping it.
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import re, subprocess, sys
+          files = subprocess.run(["git","ls-files","*.md"],capture_output=True,text=True).stdout.split()
+          pins = {}
+          for f in files:
+              for v in re.findall(r"marketplace add \S+#(v\d+\.\d+\.\d+)", open(f,encoding="utf-8").read()):
+                  pins.setdefault(v, []).append(f)
+          if not pins:
+              print("no documented install pin found — expected at least one"); sys.exit(1)
+          if len(pins) > 1:
+              print("install pins DISAGREE across the tree:")
+              for v, fs in sorted(pins.items()):
+                  print(f"  {v}: {', '.join(sorted(set(fs)))}")
+              print("bump every install line in the same reviewed edit."); sys.exit(1)
+          v, fs = next(iter(pins.items()))
+          print(f"install pin OK — {v} across {len(set(fs))} file(s)")
+          PY
       - name: Doc links resolve (relative links in tracked markdown)
         run: |
           set -euo pipefail
