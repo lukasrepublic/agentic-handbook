@@ -87,12 +87,19 @@ both when you no longer need them. What is *yours* is described in
    `.claude/settings.json`, and a model editing its own confinement is refused. It also wires the
    git commit identity and scaffolds the workspace seed.
 
-1. **Install the factory** (the Foundry plugin) — **pinned to a release tag.** An unpinned
-   `marketplace add` resolves the default branch, which is a moving target:
+1. **Install the factory** (the Foundry plugin):
    ```bash
-   claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.1
    claude plugin install foundry@agentic-foundry
    ```
+   > **You do not add the marketplace by hand, and this page names no version on purpose.**
+   > Step 0 already declared the marketplace in `.claude/settings.json`, **pinned to an exact
+   > release** with `autoUpdate: false`. That pin travels with the published CLI — a release bumps
+   > the plugin, the CLI's own version moves with it (enforced, not remembered), and `npx` resolves
+   > the current one. The version therefore lives in the artifact, not in this prose, which is why
+   > this page cannot go stale the way it did three releases running.
+   >
+   > Adopting into a workspace that already exists, so step 0 did not run? Then you do need the
+   > add, and it is in [`docs/SETUP.md`](docs/SETUP.md) — pinned, with the current tag.
 
 **Then open the session** (`claude`) and accept the trust dialog — it lists exactly the `allow`
 rules step 0 declared. Declaring is not granting; accepting the dialog is what grants them.
