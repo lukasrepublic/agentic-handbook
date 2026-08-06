@@ -84,7 +84,7 @@ plugin). They are separate on purpose: you own your requirements, you install th
 git clone https://github.com/<you>/<project>-handbook && cd <project>-handbook
 
 # 2. Install the factory
-claude plugin marketplace add lukasrepublic/agentic-foundry
+claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.1
 claude plugin install foundry@agentic-foundry
 
 # 3. Register yourself as the operator
