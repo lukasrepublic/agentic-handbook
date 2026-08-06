@@ -82,7 +82,7 @@ OUTPUT when done:
 Clone the template, wire the factory, confirm green, then scaffold the app:
 ```
 # from agentic-handbook (the workspace template) — install the factory
-claude plugin marketplace add lukasrepublic/agentic-foundry
+claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.1
 claude plugin install foundry@agentic-foundry
 /foundry:doctor                      # → DOCTOR-GREEN
 

@@ -1,9 +1,20 @@
 # Agentic Handbook — workspace template
 
 A starter **workspace** for an agentic software project — and the **control plane** for however
-many code repositories that project has. Click **"Use this template"** to create your project's
-workspace, then wire in the [**Agentic Foundry**](https://github.com/lukasrepublic/agentic-foundry)
-plugin (the factory).
+many code repositories that project has. Start it with one command, in your own terminal:
+
+```bash
+npx create-agentic-workspace
+```
+
+That is **step 0**, and it runs *before* any Claude session — because it writes the permission
+floor, and a Claude session may not write its own confinement. It previews every file and every
+capability before writing a byte, then stops. Full sequence:
+[**`docs/SETUP.md`**](docs/SETUP.md).
+
+You can also click **"Use this template"** to start from this repo's contents — but that is the
+*optional* route, and it does **not** give you the permission floor. Step 0 does, and step 0 can
+seed a fresh workspace on its own.
 
 Your specs live here. Your code lives in its own repos, hosted inside this one as gitignored
 siblings, and the factory dispatches work into each — see [Layout](#layout--one-workspace-n-repos).
@@ -60,16 +71,32 @@ Everything under `docs/example-acme-links/` and `specs/features/acme-links/` is 
 both when you no longer need them. What is *yours* is described in
 [`docs/README.md`](docs/README.md).
 
-## Setup (after "Use this template")
+## Setup
 
 > Full file-by-file anatomy of an initialized workspace + the complete runbook:
 > **[`docs/SETUP.md`](docs/SETUP.md)**. The short version:
 
-1. **Install the factory** (the Foundry plugin):
+**In your own terminal, before any session:**
+
+0. **Write the permission floor and seed the workspace:**
    ```bash
-   claude plugin marketplace add lukasrepublic/agentic-foundry
+   npx create-agentic-workspace
+   cd <project>-handbook
+   ```
+   This is the only step that cannot happen inside a Claude session — it writes
+   `.claude/settings.json`, and a model editing its own confinement is refused. It also wires the
+   git commit identity and scaffolds the workspace seed.
+
+1. **Install the factory** (the Foundry plugin) — **pinned to a release tag.** An unpinned
+   `marketplace add` resolves the default branch, which is a moving target:
+   ```bash
+   claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.1
    claude plugin install foundry@agentic-foundry
    ```
+
+**Then open the session** (`claude`) and accept the trust dialog — it lists exactly the `allow`
+rules step 0 declared. Declaring is not granting; accepting the dialog is what grants them.
+
 2. **Register operators:** edit `.claude/foundry-operators.json` (replace `op_example`).
 3. **Declare your boot recipe** (how certification deploys the release once, locally)
    and apply branch protection — see `/foundry:init` and the plugin's `docs/merge-floor.md`.
