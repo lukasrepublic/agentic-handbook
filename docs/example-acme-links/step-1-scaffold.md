@@ -7,7 +7,7 @@ then scaffold the Acme Links app it will build.
 
 ```bash
 # 1. Use this template (the workspace = the WHAT), then wire the factory (the HOW):
-claude plugin marketplace add lukasrepublic/agentic-foundry
+claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.1
 claude plugin install foundry@agentic-foundry
 /foundry:doctor                      # → DOCTOR-GREEN (the gate is live + fail-closed)
 
