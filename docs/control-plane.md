@@ -144,19 +144,26 @@ Everything from here happens **in this directory**.
 ### Step 2 — install the factory and declare yourself
 
 ```bash
-claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.0
+claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.1
 claude plugin install foundry@agentic-foundry
 ```
 
-> **Pin the released tag, not a moving target.** This guide has gone stale twice — pinned
-> `v1.0.1` when `v1.1.0` shipped, then `v1.1.0` when `v1.2.0` did. Check the plugin's own
+> **Pin the released tag, not a moving target.** This guide has now gone stale **three times** —
+> pinned `v1.0.1` when `v1.1.0` shipped, `v1.1.0` when `v1.2.0` did, and `v1.2.0` when `v1.2.1` did
+> (2026-08-06, caught while re-walking the setup path as a stranger would). Check the plugin's own
 > `CHANGELOG.md` for the current release before you install.
 >
-> **This is now checked.** `workspace-floor` fails when the documented install pins disagree across
-> the tree, so bumping the plugin is a single edit that must touch every install line together — a
-> half-done bump is a red check rather than a discovery two releases later. The check asserts
-> internal consistency; it cannot know the plugin's current version (separate repo), so keeping the
-> pin *current* is still yours — it only guarantees you cannot leave it *inconsistent*.
+> **Internal consistency is checked; currency is not — and the third recurrence is the proof.**
+> `workspace-floor` fails when the documented install pins disagree *across this tree*, so a
+> half-done bump is a red check rather than a discovery two releases later. But it cannot know the
+> plugin's current version, which lives in a separate repo — so it passed cleanly the whole time
+> this guide pointed at a superseded release. Both pins here were internally consistent and both
+> were wrong.
+>
+> That is a real gap, not a caveat to live with: the pin a reader executes is cross-repo, and a
+> repo-local check can never see it. A cross-repo currency check is queued as its own atom. Until
+> it lands, this line is the honest statement of the risk — keeping the pin *current* is a human
+> step, and it has failed three times out of three.
 
 Edit `.claude/foundry-operators.json` — replace the example with your real id. This is
 load-bearing, not paperwork: every frozen contract names an `operator_id`, and the freeze

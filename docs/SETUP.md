@@ -223,7 +223,7 @@ cd <project>-handbook
 
 # ── 2. INSTALL THE FACTORY (the Foundry plugin) ──────────────────────────────────────────
 #    Pin the marketplace to a release tag — an unpinned add resolves the default branch.
-claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.0
+claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.1
 claude plugin install foundry@agentic-foundry
 
 #    Register yourself: edit .claude/foundry-operators.json → replace op_example with your
