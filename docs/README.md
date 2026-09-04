@@ -10,7 +10,7 @@ Two kinds of document live here, and it is worth knowing which you are reading:
   control-plane.md   ◀ start here           example-acme-links/
   SETUP.md                                    ├── README.md          the 7-step tutorial
   architecture/                               ├── BUILD-JOURNEY.md   how it was really built
-                                              └── step-1 … step-7
+  command-deck-watcher/                       └── step-1 … step-7
 ```
 
 ## About your project
@@ -20,6 +20,7 @@ Two kinds of document live here, and it is worth knowing which you are reading:
 | [**`control-plane.md`**](control-plane.md) | **The operating model — read this before running more than one repo.** This workspace is a *control plane* over your code repos: they live beside it as independent, gitignored sibling repos, and the factory dispatches into them. Covers the on-disk tree, the **session rule** (always start Claude Code at this root — and what silently breaks when you don't), building one atom across two repos, and day-two operations. |
 | [`SETUP.md`](SETUP.md) | Anatomy of an initialized workspace + the setup runbook (greenfield and existing-repo), and identity isolation. |
 | [`SETUP.md` → **Multi-repo control plane**](SETUP.md#multi-repo-control-plane--hosting-your-code-repos) | The **add-a-repo mechanics**: the `target_repo` → manifest → directory mapping, why siblings rather than submodules, and the runbook. The *why* and the operating rules are in `control-plane.md` above. |
+| [**`command-deck-watcher/`**](command-deck-watcher/) | **Run a programme unattended.** A tick prompt you arm on a schedule, plus the measurement script it runs, so a session drives an authorized release forward — dispatch, verify, land, report — and escalates only what needs your hands. Compiled from measured runs; the rules exist because something failed. |
 | [`architecture/`](architecture/) | Your project's architecture docs and ADRs. Ships mostly empty — it is yours to fill. |
 | [`../CLAUDE.md`](../CLAUDE.md) | Workspace governance: the floor that never relaxes, stage mode, conventions. |
 | [`../WORKFLOW.md`](../WORKFLOW.md) | The SDLC orchestration — the phase pipeline and the artifact registry. |
