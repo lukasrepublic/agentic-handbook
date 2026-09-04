@@ -1,0 +1,93 @@
+# Command Deck programme state — copy to command-deck/<programme-id>/state.yaml
+#
+# This file survives the session; the scheduled tick job does not. It holds the part of the
+# programme that CANNOT be re-derived from the manifest, the contracts and git — and nothing that
+# can be. Anything derivable is derived every tick, because a stored copy goes stale silently.
+#
+# `scripts/command-deck-status.py <programme-id>` reads this plus the release manifest and prints
+# the tick header. It REFUSES rather than printing a zero when it cannot measure.
+
+programme: example-release
+manifest: .foundry/releases/example-release/release.yaml
+
+# When the programme started. Elapsed and the forecast are measured from here; without it the
+# script says UNMEASURABLE rather than guessing.
+started_at: "2026-09-02T08:49:00Z"
+
+# ── the atom ledger ──────────────────────────────────────────────────────────────────────────
+# One entry per manifest atom. An atom in the manifest with no entry here is reported UNMEASURED,
+# by name — never counted as zero. An entry here with no manifest atom is reported as OUTSIDE THE
+# DENOMINATOR, which is the failure where a programme reads 100% while authorized items sit
+# outside the manifest entirely.
+#
+#   stage           unbuilt | dispatched | pr-open | merged | applied | parked | blocked
+#   live_surface    true when merging is not the end of it — infra, config, anything that must be
+#                   APPLIED to the world. Such an atom is never "done" at `merged`.
+#   auth_seq        the authorized contract's sequence number
+#   built_against   the auth_seq the open branch was built against. If it lags auth_seq while a
+#                   branch is open, the current contract must be re-run against that branch — a
+#                   criterion added at re-authorization has sat unimplemented on a green PR.
+atoms:
+  - id: example-atom-one
+    stage: applied
+    live_surface: true
+    auth_seq: 1
+    built_against: 1
+    pr: 101
+
+  - id: example-atom-two
+    stage: pr-open
+    live_surface: false
+    auth_seq: 2
+    built_against: 1          # ← drift: re-run the CURRENT contract against this branch
+    pr: 108
+
+  - id: example-atom-three
+    stage: unbuilt
+    live_surface: false
+    auth_seq: 1
+    note: "spec authored, awaiting front-authorization"
+
+  - id: example-atom-four
+    stage: parked
+    live_surface: false
+    parked_because: "closing the finding needs a Deny an existing criterion forbids — an
+      authorization change, outside this atom's allowed_paths"
+    unparks_when: "the operator re-authorizes with the widened surface, or the finding is
+      re-scoped to its own atom"
+
+# ── standing directives ──────────────────────────────────────────────────────────────────────
+# A directive changes FUTURE behaviour and triggers a conformance audit of EXISTING state the
+# moment it is given. It is not a task, and it does not expire with the session.
+directives:
+  - given: "2026-09-02T14:10:00Z"
+    rule: "All infrastructure changes must be IaC — nothing hand-applied."
+    conformance_audit: "docs/audits/iac-coverage-2026-09-02.md"
+
+# ── open findings ────────────────────────────────────────────────────────────────────────────
+# Every Risk and Nit is tracked with its failure scenario, or fixed. Nothing is dropped for not
+# blocking. Every deferral names an owner — "out of scope" with no owner is a deletion with good
+# manners.
+findings:
+  - id: F-1
+    severity: risk
+    from: "security review, example-atom-one"
+    failure_scenario: "transposing the two adjacent arguments silently grants a much broader
+      permission; nothing in the test suite distinguishes the two orders"
+    disposition: tracked
+    owner: example-atom-five
+
+# ── blocked on the operator ──────────────────────────────────────────────────────────────────
+# ONLY things the watcher cannot do: an interactive credential step, a permission denial to
+# surface, external provisioning, a genuine no-consensus fork after research. Never the watcher's
+# own pending work or a CI wait.
+#
+# Each carries ONE self-contained command — preconditions verified separately and beforehand,
+# never chained into it, and no `set -e` / `trap` / `exec` at top level.
+# `measured_at` is re-derived every tick; a stale stamp is reported as STALE, not believed.
+operator_blockers:
+  - id: aws-sso-device-code
+    what: "SSO device-code approval for the staging account"
+    command: "cd /abs/path/to/workspace && aws sso login --profile example-staging"
+    preconditions_verified: true
+    measured_at: "2026-09-04T11:58:00Z"
