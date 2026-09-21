@@ -1,5 +1,15 @@
 # The Command Deck watcher
 
+> **This capability now ships natively — reach for `/foundry:command-deck` first.** The plugin's
+> `skills/command-deck/SKILL.md` is the pattern below, built out as a first-class verb:
+> `status | stop | restart | tick | prompt | list` subcommands, a capability preflight before
+> arming, the blocker schema (`claim`/`evidence`/`attempted`/`why_operator`) in place of free
+> prose, and wave-state merging into `.foundry/releases/<id>/state.yaml`'s `next_action`. This
+> directory is kept as the **historical design rationale** the shipped verb was built from — the
+> finding in §1 and the measured-learnings table in §3 are still genuinely useful reading; treat
+> everything under "How it is armed" / "Setup checklist" as the design history that led to the
+> verb, not as a build target.
+
 A single prompt, re-fired on a schedule, treating a release manifest as a work queue. Each firing is
 a **tick**: re-measure state from disk, dispatch what the dependency graph has unblocked, verify
 what finished, land what passes, report in a fixed shape. Hand it one authorized programme and walk

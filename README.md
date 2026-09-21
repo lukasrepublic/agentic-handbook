@@ -99,7 +99,12 @@ both when you no longer need them. What is *yours* is described in
    > this page cannot go stale the way it did three releases running.
    >
    > Adopting into a workspace that already exists, so step 0 did not run? Then you do need the
-   > add, and it is in [`docs/SETUP.md`](docs/SETUP.md) — pinned, with the current tag.
+   > add, and it is in [`docs/SETUP.md`](docs/SETUP.md) — also unpinned, for the same reason:
+   > `claude plugin install` resolves the current release on its own.
+   >
+   > Already wired in from an earlier release? `npx update-agentic-workspace`, run from inside
+   > the workspace, brings the marketplace, the plugin, and the managed-file floor current in
+   > one command — see [`docs/SETUP.md`](docs/SETUP.md).
 
 **Then open the session** (`claude`) and accept the trust dialog — it lists exactly the `allow`
 rules step 0 declared. Declaring is not granting; accepting the dialog is what grants them.

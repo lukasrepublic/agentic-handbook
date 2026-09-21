@@ -144,26 +144,27 @@ Everything from here happens **in this directory**.
 ### Step 2 — install the factory and declare yourself
 
 ```bash
-claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.1
+claude plugin marketplace add lukasrepublic/agentic-foundry
 claude plugin install foundry@agentic-foundry
 ```
 
-> **Pin the released tag, not a moving target.** This guide has now gone stale **three times** —
-> pinned `v1.0.1` when `v1.1.0` shipped, `v1.1.0` when `v1.2.0` did, and `v1.2.0` when `v1.2.1` did
-> (2026-08-06, caught while re-walking the setup path as a stranger would). Check the plugin's own
-> `CHANGELOG.md` for the current release before you install.
+> **No version pinned here on purpose — this guide went stale a fourth time before that changed.**
+> A literal `#vX.Y.Z` on this line went stale **four times running**: `v1.0.1` when `v1.1.0`
+> shipped, `v1.1.0` when `v1.2.0` did, `v1.2.0` when `v1.2.1` did, and `v1.2.1` itself sat here
+> another fourteen releases past the plugin's actual current tag (2026-09-21, caught by a
+> cross-repo docs audit against the plugin's own shipped tree). Four out of four is not a caveat
+> to keep living with — it is the proof that a human-maintained literal tag in prose cannot stay
+> current, no matter how often it is caught. Match the plugin's own `docs/QUICKSTART.md`
+> "Already have a repo?" step instead: no tag, so `claude plugin install` always resolves the
+> marketplace's current release, and this line cannot go stale the way it did four times.
 >
-> **Internal consistency is checked; currency is not — and the third recurrence is the proof.**
-> `workspace-floor` fails when the documented install pins disagree *across this tree*, so a
-> half-done bump is a red check rather than a discovery two releases later. But it cannot know the
-> plugin's current version, which lives in a separate repo — so it passed cleanly the whole time
-> this guide pointed at a superseded release. Both pins here were internally consistent and both
-> were wrong.
->
-> That is a real gap, not a caveat to live with: the pin a reader executes is cross-repo, and a
-> repo-local check can never see it. A cross-repo currency check is queued as its own atom. Until
-> it lands, this line is the honest statement of the risk — keeping the pin *current* is a human
-> step, and it has failed three times out of three.
+> **Internal consistency is checked; currency was never the thing that check could see.**
+> `workspace-floor`'s install-pin job fails when documented pins *disagree with each other* across
+> this tree — so a half-done bump is a red check. It cannot know the plugin's current version,
+> which lives in a separate repo, which is exactly why all four stale pins above passed that check
+> cleanly the whole time they were wrong: agreeing with each other was never the same claim as
+> being current. Dropping the literal pin here removes the failure mode outright rather than
+> chasing it with a fifth catch.
 
 Edit `.claude/foundry-operators.json` — replace the example with your real id. This is
 load-bearing, not paperwork: every frozen contract names an `operator_id`, and the freeze

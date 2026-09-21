@@ -222,13 +222,31 @@ gh repo create <you>/<project>-handbook --template lukasrepublic/agentic-handboo
 cd <project>-handbook
 
 # ── 2. INSTALL THE FACTORY (the Foundry plugin) ──────────────────────────────────────────
-#    Pin the marketplace to a release tag — an unpinned add resolves the default branch.
-claude plugin marketplace add lukasrepublic/agentic-foundry#v1.2.1
+#    No version here on purpose — see the plugin's own docs/QUICKSTART.md "Already have a
+#    repo?" step: the marketplace add is unpinned, and `claude plugin install` resolves the
+#    current release. The version lives in the artifact, not in this prose.
+claude plugin marketplace add lukasrepublic/agentic-foundry
 claude plugin install foundry@agentic-foundry
 
 #    Register yourself: edit .claude/foundry-operators.json → replace op_example with your
 #    operator id + GitHub handle. (/foundry:init will also seed this if you skip it.)
 ```
+
+Already installed from an earlier release? Bring it current with one command, run from inside
+the workspace directory, mirroring the plugin's own QUICKSTART:
+
+```bash
+npx update-agentic-workspace
+```
+
+It refreshes the marketplace (migrating a pre-v1.7.0 tag-pinned registration if it finds one),
+updates the plugin in every scope that enables it, and re-runs the managed-file and
+permission-floor reconcile — so a floor written by an older scaffold picks up a rule a later
+release added. It reads the marketplace catalogue back to confirm the refresh actually landed;
+the CLI's own "success" line does not prove that. Nothing is deleted unless you pass
+`--cleanup`. Commit whatever it reports drifted (exit `2` means a managed file changed — read
+as normal, not as failure; only exit `1` means the run itself failed). Full detail:
+`cli-update/README.md` in the plugin repo.
 
 Now open the session — **this is where the Claude Code part begins**:
 

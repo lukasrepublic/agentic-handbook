@@ -32,6 +32,12 @@ curl -s -b jar -o /dev/null -w '%{http_code}' localhost:3000/api/me             
   /foundry:authorize --reauth-after-impl   # auth_seq=2, supersedes the prior; journeys GREEN → merge
   ```
 
+  > **Footnote:** for this exact situation — correcting an already-authorized spec mid-build —
+  > `/foundry:amend` is now the first choice: it re-freezes non-widening changes (this redirect
+  > code is one) without an operator step, and only routes to `/foundry:authorize` itself when a
+  > change actually widens the boundary. `--reauth-after-impl` above still works; reach for
+  > `/foundry:amend` first on a new build.
+
 ## Checkpoint
 
 ```bash
