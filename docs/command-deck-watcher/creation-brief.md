@@ -1,31 +1,29 @@
-# Creation brief — the Command Deck watcher as a first-class capability
+# Creation brief — the Command Deck watcher as a first-class capability (historical)
 
-> Hand this to a fresh Agentic Foundry session. It is a **creation brief**, not a spec: the session
-> should run the normal intake → spec → review → authorize → build lane and produce the atoms.
-> Everything below is grounded in one real 12-hour autonomous run driving a release to completion.
-> Every operational case is something that **actually happened**, with the failure mode that was
-> observed. Where a rule exists because the run got it wrong, that is stated — the failure is the
-> evidence, and a rule with no failure behind it is the weakest kind.
+> **Do not build this — it already shipped, as `/foundry:command-deck`.** This brief asked a
+> fresh session to turn the tick-prompt pattern into "a skill, a persisted programme state, and
+> the deterministic guardrails that a prompt can only ask for." The plugin's
+> `skills/command-deck/SKILL.md` is exactly that: `status | stop | restart | tick | prompt |
+> list`, a capability preflight before arming, the blocker schema
+> (`claim`/`evidence`/`attempted`/`why_operator`), and wave-state merging into
+> `.foundry/releases/<id>/state.yaml`'s `next_action`. Reach for the shipped verb, not this
+> brief, for a real build.
 >
-> This is the *other* half of [`README.md`](README.md). If you want the pattern working this
-> afternoon, arm [`tick-prompt.template.md`](tick-prompt.template.md) instead — it needs nothing
-> built.
+> What follows is kept as **historical design rationale** — grounded in one real 12-hour
+> autonomous run driving a release to completion, with every operational case something that
+> **actually happened** and the failure mode it closed. That evidence shaped the shipped verb's
+> design and is still worth reading for the "why," even though §1's build instruction below is
+> superseded.
 
 ---
 
-## 1. What to build
+## 1. What to build (superseded — see the banner above)
 
-A **Command Deck watcher**: a first-class, reusable capability that lets an operator hand a
-programme to an agent session and walk away, while the session drives it forward on a timer —
-dispatching workers, verifying their output independently, landing merges, keeping a work tracker
-current, and surfacing a short executive status each tick.
-
-Today this exists only as a **prompt** the operator arms on a schedule. It works, but the whole
-operating discipline lives in that prompt string and in the driving model's judgment. Nothing
-enforces it, nothing carries between sessions, and every hard-won rule has to be re-typed.
-
-The goal: turn the prompt into a **capability with mechanism** — a skill, a persisted programme
-state, and the deterministic guardrails that a prompt can only *ask* for.
+Originally: a **Command Deck watcher** as a first-class, reusable capability that lets an
+operator hand a programme to an agent session and walk away, while the session drives it
+forward on a timer — dispatching workers, verifying their output independently, landing merges,
+keeping a work tracker current, and surfacing a short executive status each tick. That capability
+now ships as `/foundry:command-deck`; nothing here needs building.
 
 ---
 

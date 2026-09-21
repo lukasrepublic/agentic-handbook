@@ -70,7 +70,14 @@ worker is redirected into the hosted repo's working tree; its merge floor is tha
 - **Releases** — `.foundry/releases/<id>/release.yaml` is the authoritative manifest (that exact
   path is where the factory resolves it — `<id>` is an `[a-z0-9-]+` slug); lifecycle views under
   `specs/lifecycle/` are generated, never hand-edited.
-- **Git discipline** — branch per atom; PR-then-merge; the merge floor admits the merge.
+- **Git discipline** — one worktree/branch per atom (`atom/<id>`, cut from the release's
+  `release/<version>` integration branch, never from `main` directly); the atom's PR targets the
+  release branch, not `main`; `main` receives **one PR per release** (a hotfix is the one
+  exception: `hotfix/<id>` → `main` directly, stated in the PR body); delete a branch only after
+  `origin` contains the merge, never before, using `scripts/foundry-worktree-gc.py --dry-run`
+  then `--apply` for the sweep. Full discipline (with the "why": one deploy trigger per release,
+  not one per atom): the plugin's `context/branch-discipline.md` and
+  `docs/how-to/branching-and-cleanup.md`.
 
 ## Implementation-merge autonomy (per-session)
 
