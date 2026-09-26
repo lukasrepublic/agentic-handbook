@@ -48,3 +48,8 @@
   auth guard incl. CVE-2025-29927 (AC-DASH-3), empty-state (AC-DASH-4), and ordering/pagination
   bound (AC-DASH-7); denied `src/lib/auth/**` + `src/middleware.ts` so the atom can't repoint
   the auth gate; stated the two-user fixture precondition.
+
+## Amendments
+
+| date | what changed | why reality required it | auth_seq |
+|---|---|---|---|

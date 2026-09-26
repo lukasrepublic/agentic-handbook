@@ -42,3 +42,8 @@
   URL length bound (AC-CREATE-4); made the uniqueness checkpoint non-vacuous (AC-CREATE-5,
   witnessed across many slugs); added slug-unguessability (AC-CREATE-6) and an explicit
   no-dedup statement (AC-CREATE-7).
+
+## Amendments
+
+| date | what changed | why reality required it | auth_seq |
+|---|---|---|---|

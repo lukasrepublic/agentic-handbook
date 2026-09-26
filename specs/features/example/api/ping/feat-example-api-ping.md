@@ -13,3 +13,8 @@
 ## Changelog
 
 - v1.0 Draft. (example)
+
+## Amendments
+
+| date | what changed | why reality required it | auth_seq |
+|---|---|---|---|

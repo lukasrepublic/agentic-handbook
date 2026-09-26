@@ -53,3 +53,8 @@
   rate-limiting (AC-AUTH-9); introduced the auth-owned `/api/me` probe to remove the
   cross-atom `/api/links` surface borrow. Residual (bounded): single shared Drizzle schema dir
   — table ownership by convention, not by glob.
+
+## Amendments
+
+| date | what changed | why reality required it | auth_seq |
+|---|---|---|---|

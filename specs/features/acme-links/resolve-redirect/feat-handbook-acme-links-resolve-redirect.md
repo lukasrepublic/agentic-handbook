@@ -46,3 +46,8 @@
   (AC-RESOLVE-3), slug-charset/traversal handling (AC-RESOLVE-5), and cache-header /
   side-effect constraints (AC-RESOLVE-6); **added `src/db/**` to `allowed_paths`** so the real
   lookup+write fix is in-scope.
+
+## Amendments
+
+| date | what changed | why reality required it | auth_seq |
+|---|---|---|---|
