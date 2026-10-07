@@ -17,13 +17,15 @@ Two kinds of document live here, and it is worth knowing which you are reading:
 
 | Document | What it is |
 |---|---|
-| [**`control-plane.md`**](control-plane.md) | **The operating model — read this before running more than one repo.** This workspace is a *control plane* over your code repos: they live beside it as independent, gitignored sibling repos, and the factory dispatches into them. Covers the on-disk tree, the **session rule** (always start Claude Code at this root — and what silently breaks when you don't), building one atom across two repos, and day-two operations. |
+| [**`../OPERATING-MODEL.md`**](../OPERATING-MODEL.md) | **The one-page operating model — read this first.** One artifact per change (a ticket with a runnable `Done means`), the loop, the floor, what is deliberately absent, when a spec is still used, and how the agent conducts itself. |
+| [**`control-plane.md`**](control-plane.md) | **The control-plane guide — read this before running more than one repo.** This workspace is a *control plane* over your code repos: they live beside it as independent, gitignored sibling repos, and the factory dispatches into them. Covers the on-disk tree, the **session rule** (always start Claude Code at this root — and what silently breaks when you don't), building one atom across two repos, and day-two operations. |
 | [`SETUP.md`](SETUP.md) | Anatomy of an initialized workspace + the setup runbook (greenfield and existing-repo), and identity isolation. |
 | [`SETUP.md` → **Multi-repo control plane**](SETUP.md#multi-repo-control-plane--hosting-your-code-repos) | The **add-a-repo mechanics**: the `target_repo` → manifest → directory mapping, why siblings rather than submodules, and the runbook. The *why* and the operating rules are in `control-plane.md` above. |
 | [**`command-deck-watcher/`**](command-deck-watcher/) | **Run a programme unattended: reach for `/foundry:command-deck` first** (the plugin's `skills/command-deck/SKILL.md`) — it ships the watcher this directory once asked you to hand-build (`status \| stop \| restart \| tick \| prompt \| list`, capability preflight, the blocker schema, wave-state merging). This directory is now the historical design rationale the shipped verb was built from — the measured-learnings table (what the instrument said vs. what was actually true) is still genuinely useful reading. |
 | [`architecture/`](architecture/) | Your project's architecture docs and ADRs. Ships mostly empty — it is yours to fill. |
 | [`../CLAUDE.md`](../CLAUDE.md) | Workspace governance: the floor that never relaxes, stage mode, conventions. |
-| [`../WORKFLOW.md`](../WORKFLOW.md) | The SDLC orchestration — the phase pipeline and the artifact registry. |
+| [`../WORKFLOW.md`](../WORKFLOW.md) | Where things live — the ticket lane, the opt-in spec lane, and the artifact map. |
+| [`../templates/ci.yml`](../templates/ci.yml) | The CI template a code repo copies: runs on ready-for-review PRs only, cancels superseded runs, deploys on promote (tag or label), never on merge. |
 
 ## About the demo (Acme Links)
 
