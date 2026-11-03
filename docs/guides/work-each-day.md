@@ -35,7 +35,7 @@ Checked against the foundry base tree `origin/atom/subtract`; the release pin is
 
 2. **Resume before starting.** Finish In progress and Review follow-up first; pick new work only from
    your own, unblocked, Ready tasks. Until the owned-queue verbs ship you select by reading the list above.
-   `/foundry:next` is pending: lands with gn-08, and so are claim, reconcile and lead.
+   The owned-queue verbs `scripts/foundry-ticket.py next` (then `claim`, `reconcile`, `lead`) are pending: lands with gn-08.
 
 3. **Start the Command Deck** to run workers and inspect requests. `/foundry:command-deck` is pending: lands with gn-10.
    Without it, use the manual path in
