@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: The working agreement
+    url: https://github.com/OWNER/REPO/blob/main/OPERATING-MODEL.md
+    about: States, ownership, completion meanings and how to ask another operator for something. Replace OWNER/REPO with this repository.

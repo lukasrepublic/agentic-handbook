@@ -1,0 +1,74 @@
+name: Task
+description: One executable outcome, with one accountable owner and a runnable "Done means".
+title: "[task] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One issue is one task. Set the owner as the single assignee. Only the planning owner moves it to Ready.
+        See OPERATING-MODEL.md for the states and completion meanings.
+  - type: textarea
+    id: what
+    attributes:
+      label: What
+      description: The intended result, in a sentence or two.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: Why this matters now.
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      description: The one accountable human (GitHub login). Also set them as the issue assignee.
+      placeholder: "@login"
+    validations:
+      required: true
+  - type: input
+    id: target-repo
+    attributes:
+      label: Target repo key
+      description: A key from `repos{}` in `.claude/foundry-project.json`. For a document outcome, name the document.
+      placeholder: "api"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: What must be true for the outcome to be accepted. One per line.
+    validations:
+      required: true
+  - type: textarea
+    id: done-means
+    attributes:
+      label: Done means
+      description: A command that exits 0 when the work is done. Optional for a document outcome; then name the accepting owner and the reviewable result in the acceptance criteria.
+      render: shell
+      placeholder: "make test && curl -fsS https://beta.example.test/healthz"
+    validations:
+      required: false
+  - type: textarea
+    id: context-links
+    attributes:
+      label: Context links
+      description: Runbooks, decisions, related issues or PRs.
+    validations:
+      required: false
+  - type: dropdown
+    id: work-type
+    attributes:
+      label: Work type
+      options:
+        - code
+        - architecture
+        - security
+        - operations
+        - document
+    validations:
+      required: true
