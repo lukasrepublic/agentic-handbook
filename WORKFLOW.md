@@ -8,11 +8,11 @@ operator chooses it.
 ## The default loop (ticket lane)
 
 ```
- ticket (What / Why / Done means / Paper allowed)
+ task (What / Why / Owner / Target repo key / Acceptance criteria / Done means / Context)
    → branch from main → build → local-green (foundry-test.sh)
    → one draft PR → ready when Done means passes → one review pass
    → merge on green → deploy on promote (tag or label)
-   → close the ticket with the Done-means output
+   → accept and close with evidence, per Completion meanings in OPERATING-MODEL.md
 ```
 
 States, ownership and what counts as done are defined in `OPERATING-MODEL.md` only.
@@ -47,9 +47,9 @@ not go through a code repo's pipeline.
 
 | Artifact | Location |
 |---|---|
-| the ticket (the unit of work) | the forge's issue tracker — `What / Why / Done means / Paper allowed` |
+| the task (the unit of work) | a GitHub issue from the task form — What / Why / Owner / Target repo key / Acceptance criteria / Done means / Context |
 | the PR + its checks | the code repo; one PR per ticket, draft until local-green |
-| the record of done | the closed ticket, carrying the `Done means` output |
+| the record of done | the issue closed as `completed` with the accepting actor and evidence linked (Completion meanings in `OPERATING-MODEL.md`); a passing Done-means run is verification, not acceptance |
 | the CI template for a code repo | [`templates/ci.yml`](templates/ci.yml) (skips drafts, cancels superseded runs, deploys on promote) |
 | the weekly metrics line | stdout of `foundry-delivery-metrics.py` — paper:code, PRs merged, lead time; not a report |
 | an opt-in spec | `specs/features/<product>/<domain>/<capability>/feat-*.md` |

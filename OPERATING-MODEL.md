@@ -149,13 +149,13 @@ repeated scan from writing it twice.
 
 | Event | Source |
 |---|---|
-| Ready | Project `Status` change to Ready (or the `ready` label). The first one counts; going back to Backlog does not reset it. |
+| Ready | Project `Status` change to Ready (pilot fallback: the `status:ready` label). The first one counts; going back to Backlog does not reset it. |
 | Start | Project `Status` to In progress, with the connected branch or draft PR. First start counts; pauses and ownership changes do not reset it. |
-| Acceptance | Issue closed with `completed` (or Status Done), with the accepting actor and an evidence link. Merge alone counts only where it satisfies the agreed scope. |
-| Request and commitment | The request issue and its blocked-by link (native). Target and any later schedule change: `foundry-deck` event `scheduled` (a later change: `rescheduled`, carrying `original_target`). |
+| Acceptance | Issue closed with `completed` (or Status Done) by the owner or the named accepting human, with the accepting actor and an evidence link. Closing, merging or a passing check alone counts only where it satisfies the agreed scope; Project automation never records acceptance. |
+| Request and commitment | The request issue and its blocked-by link (native); the blocking timestamp is the later of the blocked-by-added event and the assignment to the target. Target and any later schedule change: `foundry-deck` event `scheduled` (a later change: `rescheduled`, carrying `original_target`). |
 | Request acknowledgement | `foundry-deck` event `ack` on the request. |
 | Blocker acknowledgement | `foundry-deck` event `blocker_ack`, at or after the request became blocking and targeted. An earlier `ack` does not count. |
-| Verified resolution | `foundry-deck` event `resolved` with evidence that the dependency is satisfied; a read notification or automated reply does not. |
+| Verified resolution | `foundry-deck` event `resolved`, recorded by the target operator's deck or by the target operator, with evidence that the dependency is satisfied; a read notification or automated reply does not. |
 | Assignment intervals | Native assigned and unassigned timeline events. |
 | Handoff | `foundry-deck` event `handoff` naming the next owner and evidence. |
 | Review readiness | `foundry-deck` event `review_ready` with the PR and CI-run links; `accepted` records the accepting actor and evidence where closure alone is not the scope. |

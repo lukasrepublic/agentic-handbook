@@ -58,15 +58,23 @@ exist, so this setup uses labels and Project fields instead. The meanings do not
 | `request` | An action needed from another operator. Applied by the request form. |
 | `work:code`, `work:architecture`, `work:security`, `work:operations`, `work:document` | The work type, when you want it on the issue as well as in the Project. Applied by hand. |
 | `repo:<key>` | The target repository, where you want to filter by it. `<key>` is a `repos{}` key. |
-| `status:backlog`, `status:ready`, `status:in-progress`, `status:review`, `status:done` | A fallback for the Status field where Project access is unavailable. The Project field wins if both exist. |
+| `status:backlog`, `status:ready`, `status:in-progress`, `status:review`, `status:done` | Pilot fallback only, for an operator whose token cannot read the Project yet. The Project `Status` field is the state; the deck never writes these labels when the field is readable. |
 
 Create the labels yourself; nothing here creates them for you. An expedited exception to the capacity
 limit is also a visible label plus a one-line comment, as the working agreement says.
 
+## Project automation: switch the built-in workflows off
+
+GitHub Projects ships two built-in workflows that are ON by default: **item closed → Done** and
+**pull request merged → Done**. Left on, they mark a `not_planned` or `duplicate` closure as Done and
+mark a merge as Done while a human decision is still outstanding — exactly what the working
+agreement forbids. Open the Project → Workflows and disable both (keep *item added → Backlog* and
+*auto-add* if you use them). Done is set by the accepting human, not by automation.
+
 ## Requests and blockers
 
 Open a request from `request.yml`, assign it to the target operator, and mark your own task blocked by
-it (the issue sidebar, or `gh issue create --blocked-by <n>`). Add an issue to the Project with
+it (the issue sidebar, or `gh issue edit <your-task> --add-blocked-by <request>`; `gh issue create --blocked-by <n>` is for a NEW issue that is blocked by `n`). Add an issue to the Project with
 `gh issue edit <n> --add-project "<project title>"`.
 
 ## Credentials: one set per operator
@@ -94,7 +102,7 @@ proposal; nothing reads it yet and it is not in the shipped file.
   "owner": "acme",                 // user or organization that owns the Project
   "planning_repo": "acme-handbook",
   "project_number": 1,             // the shared Project
-  "operators": { "lukas-login": "op_lukas", "sam-login": "op_sam" }  // GitHub login -> operator id
+  "operators": { "alice-login": "op_alice", "bob-login": "op_bob" }  // GitHub login -> operator id
 }
 ```
 

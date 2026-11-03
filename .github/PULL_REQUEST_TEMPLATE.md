@@ -16,4 +16,4 @@ A local path or "passed" is not evidence. -->
 
 ## Outstanding human decision
 
-<!-- Anything a person must still decide or approve before the issue is accepted. Write "none" if so. -->
+<!-- Anything a person must still decide or approve before the issue is accepted. Write "none" if there is none. -->
