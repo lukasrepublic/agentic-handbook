@@ -152,12 +152,13 @@ repeated scan from writing it twice.
 | Ready | Project `Status` change to Ready (or the `ready` label). The first one counts; going back to Backlog does not reset it. |
 | Start | Project `Status` to In progress, with the connected branch or draft PR. First start counts; pauses and ownership changes do not reset it. |
 | Acceptance | Issue closed with `completed` (or Status Done), with the accepting actor and an evidence link. Merge alone counts only where it satisfies the agreed scope. |
-| Request and commitment | The request issue and its blocked-by link (native). Target and any later schedule change: `foundry-deck` event `schedule`, keeping the first target. |
+| Request and commitment | The request issue and its blocked-by link (native). Target and any later schedule change: `foundry-deck` event `scheduled` (a later change: `rescheduled`, carrying `original_target`). |
 | Request acknowledgement | `foundry-deck` event `ack` on the request. |
-| Blocker acknowledgement | `foundry-deck` event `blocker-ack`, at or after the request became blocking and targeted. An earlier `ack` does not count. |
+| Blocker acknowledgement | `foundry-deck` event `blocker_ack`, at or after the request became blocking and targeted. An earlier `ack` does not count. |
 | Verified resolution | `foundry-deck` event `resolved` with evidence that the dependency is satisfied; a read notification or automated reply does not. |
 | Assignment intervals | Native assigned and unassigned timeline events. |
 | Handoff | `foundry-deck` event `handoff` naming the next owner and evidence. |
+| Review readiness | `foundry-deck` event `review_ready` with the PR and CI-run links; `accepted` records the accepting actor and evidence where closure alone is not the scope. |
 | Cancellation, duplicate, reopen, reacceptance | Native closed (`not_planned`, `duplicate`) and reopened events; reacceptance is distinct from first acceptance. |
 
 - **Work types**: `code | architecture | security | operations | document`, as a label or Project field.
