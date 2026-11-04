@@ -1,0 +1,48 @@
+name: Operator request
+description: An action, review, decision or approval you need from another operator.
+title: "[request] "
+labels:
+  - request
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Assign this issue to the operator you need it from. Then mark your own task "blocked by" this issue
+        if you cannot proceed without it. Keep your own task; this issue is the request.
+  - type: input
+    id: target-operator
+    attributes:
+      label: Target operator
+      description: The GitHub login of the person who must act.
+      placeholder: "@login"
+    validations:
+      required: true
+  - type: textarea
+    id: required-action
+    attributes:
+      label: Required action
+      description: The exact need, stated so it can be satisfied and verified.
+    validations:
+      required: true
+  - type: textarea
+    id: affected-work
+    attributes:
+      label: Affected work
+      description: What is delayed or at risk without this, with links.
+    validations:
+      required: true
+  - type: input
+    id: blocks
+    attributes:
+      label: Issue this blocks
+      description: The requester's task, as an issue number or URL. Leave empty if it blocks nothing.
+      placeholder: "#123"
+    validations:
+      required: false
+  - type: input
+    id: target-date
+    attributes:
+      label: Target date
+      description: Optional, for a non-blocking request.
+    validations:
+      required: false

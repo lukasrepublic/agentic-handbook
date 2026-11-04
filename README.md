@@ -149,16 +149,16 @@ Three git repositories, one directory tree. The boundaries are the point:
 - **The factory is not in this tree.** The plugin installs under `~/.claude/plugins/…`; upgrading
   it touches nothing above.
 
-A ticket reaches a repo by naming its manifest key:
+A task reaches a repo by naming its manifest key (the form's *Target repo key*):
 
 ```
-   the ticket                          .claude/foundry-project.json          on disk
-   ──────────                          ───────────────────────────          ───────
-   repo: api                 ─────►    repos.api.path = "api"        ─────►   ./api/
+   the task                            .claude/foundry-project.json          on disk
+   ────────                            ───────────────────────────          ───────
+   Target repo key: api      ─────►    repos.api.path = "api"        ─────►   ./api/
 ```
 
 **Starting with one repo?** That is the default — a fresh template seeds only the `workspace`
-self-entry, and a ticket that names no repo is workspace-targeted. Nothing to configure until you
+self-entry, and a task whose Target repo key is `workspace` is workspace-targeted. Nothing to configure until you
 add a second repo.
 
 > **Running more than one repo? Read [`docs/control-plane.md`](docs/control-plane.md) first.**

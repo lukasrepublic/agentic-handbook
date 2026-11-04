@@ -166,6 +166,10 @@ claude plugin install foundry@agentic-foundry
 > being current. Dropping the literal pin here removes the failure mode outright rather than
 > chasing it with a fifth catch.
 
+Each operator authenticates with their own credentials (their own `gh` login and token); never
+share or copy one between people. If a shared GitHub Project already exists for this workspace, reuse
+it rather than creating another; see [`github-planning-surface.md`](github-planning-surface.md).
+
 Edit `.claude/foundry-operators.json` — replace the example with your real id. This is
 load-bearing, not paperwork: every frozen contract names an `operator_id`, and the freeze
 fail-closes if the id does not resolve here.
@@ -374,6 +378,10 @@ workspace-targeted by definition.
 **Someone joining the project** — they clone the control plane, install the plugin, add
 themselves to the operator registry, then clone each hosted repo into the paths the manifest
 already names. The manifest *is* the onboarding document.
+
+A joining operator signs in with their own credentials (never a colleague's, never copied) and reuses
+the existing shared Project rather than creating one. The scopes and views are in
+[`github-planning-surface.md`](github-planning-surface.md).
 
 **Upgrading the factory** — `claude plugin update foundry@agentic-foundry`. Your specs,
 manifest, and hosted repos are untouched; the plugin is not in your tree.
