@@ -1,6 +1,6 @@
 # Upgrade and migrate an existing Foundry workspace
 
-> **Prerequisite: team mode.** Moving active work to GitHub (adoption and cutover) is a team-mode step. The upgrade itself lands in single-operator mode. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`; pending: lands with gn-17). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
+> **Prerequisite: team mode.** Moving active work to GitHub (adoption and cutover) is a team-mode step. The upgrade itself lands in single-operator mode. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
 
 Two separate things happen to an older project: the plugin and managed files are refreshed
 (installation), and selected active work is moved to GitHub with a recorded decision about which

@@ -1,6 +1,6 @@
 # Diagnose and recover
 
-> **Prerequisite: team mode.** The inbox, Project and Command Deck checks below apply only to a team-mode workspace. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`; pending: lands with gn-17). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
+> **Prerequisite: team mode.** The inbox, Project and Command Deck checks below apply only to a team-mode workspace. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
 
 What to check, and what to do next, when something is off: the wrong workspace or version, stale
 instructions, missing GitHub access, a partial inbox, duplicate leads, an interrupted migration,

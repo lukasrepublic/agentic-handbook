@@ -1,6 +1,6 @@
 # Join an existing team
 
-> **Prerequisite: team mode.** The team you join runs in team mode; the shared Project, inbox and requests below exist only there. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`; pending: lands with gn-17). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
+> **Prerequisite: team mode.** The team you join runs in team mode; the shared Project, inbox and requests below exist only there. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
 
 You are a new engineer on a project that already has a workspace, a shared GitHub Project and a
 working agreement. You set up your own access and environment, reuse everything shared, and prove it

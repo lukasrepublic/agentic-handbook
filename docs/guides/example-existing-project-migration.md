@@ -1,6 +1,6 @@
 # Example: migrating one active item of an existing project
 
-> **Prerequisite: team mode.** The shared Project and GitHub issue migration below apply only in team mode. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`; pending: lands with gn-17). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
+> **Prerequisite: team mode.** The shared Project and GitHub issue migration below apply only in team mode. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
 
 A worked walk-through of [upgrade-and-migrate.md](upgrade-and-migrate.md) for one in-flight item.
 The project, names and numbers are invented. The five per-item steps are those of the migration
@@ -31,11 +31,11 @@ The 2.0 upgrade lands the workspace in single-operator mode. Team mode is a deli
 by the Project adoption owner, taken only after the upgrade and `/foundry:post-upgrade` are done:
 
 ```bash
-/foundry:team-mode enable   # pending: lands with gn-17
+/foundry:team-mode enable
 ```
 
 It requires plugin 2.0.0 or later, a configured `github_scope` and a capability check of at least
-`partial`. It is reversible (pending: lands with gn-17): `/foundry:team-mode disable` returns to single-operator mode and keeps
+`partial`. It is reversible: `/foundry:team-mode disable` returns to single-operator mode and keeps
 all history. Shared cutover happens once; each operator then does their own setup.
 
 ### 0. Inventory: custom rules, active obligations, retained history
