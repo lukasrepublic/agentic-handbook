@@ -1,5 +1,11 @@
 # The GitHub planning surface
 
+> **Team mode only.** This page is a prerequisite for team mode, not for the default single-operator
+> mode. Enable team mode first with `/foundry:team-mode enable` (script
+> `scripts/foundry_operating_mode.py enable-team`); see "Operating modes" in
+> [`../OPERATING-MODEL.md`](../OPERATING-MODEL.md). The issue and PR templates below stay as they are
+> and are harmless in single-operator mode.
+
 Where the team plans and coordinates: one shared GitHub Project, two issue forms, a PR template and a
 few labels. The meanings (states, ownership, completion, requests) are defined once in
 [`../OPERATING-MODEL.md`](../OPERATING-MODEL.md); this page is the setup that makes them visible.
