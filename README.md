@@ -16,44 +16,33 @@ You can also click **"Use this template"** to start from this repo's contents �
 *optional* route, and it does **not** give you the permission floor. Step 0 does, and step 0 can
 seed a fresh workspace on its own.
 
-Your specs live here. Your code lives in its own repos, hosted inside this one as gitignored
-siblings, and the factory dispatches work into each — see [Layout](#layout--one-workspace-n-repos).
+Your governance lives here. Your code lives in its own repos, hosted inside this one as gitignored
+siblings — see [Layout](#layout--one-workspace-n-repos).
 
-## The model: Workspace (WHAT) + Factory (HOW)
+## The operating model — one page
 
-> **This workspace holds the _WHAT_ to build. The Foundry plugin determines _HOW_ it
-> gets built. The plugin is wired _into_ this workspace.**
+> **One artifact per change: a ticket with a runnable "Done means". The platform is the gate.**
 
-- **This repo (the workspace)** holds the **agentic SDLC artifacts** — the instruction
-  set of *what* to build — plus the governance, corpus, and orchestration around it.
-- **The Foundry plugin (the factory)** brings the *verbs*: the process + trust model +
-  the honestly-tiered merge floor that turn that instruction set into merged code. Generic, versioned,
-  shared — **wired into** this workspace.
+The whole model is [**`OPERATING-MODEL.md`**](OPERATING-MODEL.md): the ticket template, the loop
+(branch → build → local-green → one draft PR → merge on green → deploy on promote → close with
+the check's output), the floor that never relaxes, what is deliberately absent, and when a spec is
+still used (operator-chosen: `security: true`, or a design too large for one ticket).
 
-Full model: the plugin's [`docs/architecture.md`](https://github.com/lukasrepublic/agentic-foundry/blob/main/docs/architecture.md).
+- **This repo (the workspace)** holds the governance: the operator registry, the repo manifest,
+  the CI template, and the opt-in specs when the operator asks for one.
+- **The Foundry plugin (the factory)** brings the tooling that makes the model hold without
+  ceremony: `foundry-ticket.py`, `foundry-test.sh` (local-green before push), the paper guard, the
+  Stop hook that runs `Done means`, the git-discipline hook, and the security-review lane.
 
-## The WHAT ladder (what lives here)
+Full plugin model: the plugin's [`docs/architecture.md`](https://github.com/lukasrepublic/agentic-foundry/blob/main/docs/architecture.md).
 
-Intent is progressively refined, in this workspace, into a machine-executable instruction set:
-
-```
-human-readable specs            ← intent (PRDs, user stories) — specs/features/.../feat-*.md
-        │
-LLM-friendly functional specs   ← deterministic atomic specs with stable AC-IDs + designs
-   + designs
-        │
-frozen acceptance contracts     ← content-hashed, operator-signed — acceptance-contract.yaml
-```
-
-See the minimal worked example in
-[`specs/features/example/api/ping/`](specs/features/example/api/ping/).
-
-## Learn the loop — the Acme Links worked example
+## Learn the spec lane — the Acme Links worked example
 
 **Acme Links is the demo, not your project.** It is a small link shortener (accounts, a database,
-a dashboard) built through the factory from an empty repo to a governed, live-proven merge, so the
-loop is shown rather than asserted. The gate blocks a deliberately broken seam along the way,
-which is what makes `status ≠ functional` visceral.
+a dashboard) built from an empty repo to a live-proven merge, so the loop is shown rather than
+asserted. It exercises the **opt-in spec lane** end to end (the app has auth, so the operator chose
+specs); your day-to-day changes take the ticket lane in `OPERATING-MODEL.md` instead. The gate
+blocks a deliberately broken seam along the way, which is what makes `status ≠ functional` visceral.
 
 Two ways in — do it, or read what happened:
 
@@ -109,20 +98,22 @@ both when you no longer need them. What is *yours* is described in
 **Then open the session** (`claude`) and accept the trust dialog — it lists exactly the `allow`
 rules step 0 declared. Declaring is not granting; accepting the dialog is what grants them.
 
-2. **Register operators:** edit `.claude/foundry-operators.json` (replace `op_example`).
-3. **Declare your boot recipe** (how certification deploys the release once, locally)
-   and apply branch protection — see `/foundry:init` and the plugin's `docs/merge-floor.md`.
+2. **Register operators:** edit `.claude/foundry-operators.json` (replace `op_example`; the
+   standing authorization recorded there is what makes ticket assignment the authorization).
+3. **Apply branch protection** on each code repo's `main` (required checks on, no force-push) and
+   copy [`templates/ci.yml`](templates/ci.yml) into it — see `/foundry:init` and the plugin's
+   `docs/merge-floor.md`.
 4. **Verify the wiring:** `/foundry:doctor` → `DOCTOR-GREEN`.
 
 ## The loop
 
 ```
-/foundry:intake → /foundry:spec-review → /foundry:authorize → /foundry:dispatch
-      → the merge floor (your CI + branch protection) → /foundry:certify-local → your sign-off
+ticket → branch → build → local-green → one draft PR → ready when Done means passes
+      → one review pass → merge on green → deploy on promote → close with the Done-means output
 ```
 
-Two hard gates (authorize, the floor), one honest tail (certify, sign-off). The full
-orchestration + artifact registry: [`WORKFLOW.md`](WORKFLOW.md).
+One gate (branch protection + CI), one check (`Done means`), one operator walkthrough per release.
+The one-page model: [`OPERATING-MODEL.md`](OPERATING-MODEL.md); where things live: [`WORKFLOW.md`](WORKFLOW.md).
 
 ## Layout — one workspace, N repos
 
@@ -133,22 +124,20 @@ repo with its own history, PRs, CI and merge floor. The factory dispatches work 
 ```
 <project>-handbook/                      ◀── git repo #1 — the workspace. YOU commit this one.
 │
-├── CLAUDE.md · WORKFLOW.md                  governance + the SDLC pipeline
+├── OPERATING-MODEL.md · WORKFLOW.md         the one-page model + where things live
+├── CLAUDE.md                                governance loaded into every session
 ├── .claude/
 │   ├── settings.json                        the wiring (enabledPlugins → the factory)
-│   ├── foundry-operators.json               who is allowed to authorize
+│   ├── foundry-operators.json               the operators and their standing authorization
 │   └── foundry-project.json   ◀── THE MANIFEST. repos{} maps a dispatch key → a path below.
-├── specs/
-│   ├── features/<product>/…                 the WHAT: feat-*.md + acceptance-contract.yaml
-│   └── lifecycle/                           generated lifecycle views (never hand-edited)
-├── .foundry/releases/<id>/release.yaml      the authoritative release manifest
-├── docs/ · status-reports/ · context/
+├── templates/ci.yml                         the CI template each code repo copies
+├── specs/features/<product>/…               opt-in specs (operator-chosen; security or large design)
+├── docs/
 ├── .gitignore                 ◀── every hosted repo below is listed here, root-anchored (/api/)
 │
 ├── api/                                 ◀── git repo #2 — GITIGNORED. Not a submodule.
-│   ├── .git/                                its own history, branches, PRs, CI, merge floor
-│   ├── src/…                                the HOW-built: your application code
-│   └── .foundry/build-provenance.yaml       pins the repo-#1 commit that authorized this atom
+│   ├── .git/                                its own history, branches, PRs, CI, branch protection
+│   └── src/…                                your application code
 │
 └── infra/                               ◀── git repo #3 — GITIGNORED. Same deal.
     ├── .git/
@@ -161,23 +150,22 @@ Three git repositories, one directory tree. The boundaries are the point:
   entries, so the control plane cannot accidentally commit your app.
 - **Each hosted repo keeps a fully independent history.** No submodule pointer, no entangled
   histories, no `git submodule update`.
-- **The link runs the other way.** Each built atom writes `.foundry/build-provenance.yaml` *in the
-  code repo*, pinning the workspace commit whose frozen contract authorized it — traceability
-  without coupling.
+- **The record of a change is its closed ticket** (with the `Done means` output) and the merged
+  PR in the code repo — traceability without a file to keep in sync.
 - **The factory is not in this tree.** The plugin installs under `~/.claude/plugins/…`; upgrading
   it touches nothing above.
 
-A spec reaches a repo by naming its manifest key:
+A ticket reaches a repo by naming its manifest key:
 
 ```
-   acceptance-contract.yaml            .claude/foundry-project.json          on disk
-   ───────────────────────             ───────────────────────────          ───────
-   target_repo: api          ─────►    repos.api.path = "api"        ─────►   ./api/
+   the ticket                          .claude/foundry-project.json          on disk
+   ──────────                          ───────────────────────────          ───────
+   repo: api                 ─────►    repos.api.path = "api"        ─────►   ./api/
 ```
 
 **Starting with one repo?** That is the default — a fresh template seeds only the `workspace`
-self-entry, and a contract with no `target_repo` is workspace-targeted. Nothing to configure
-until you add a second repo.
+self-entry, and a ticket that names no repo is workspace-targeted. Nothing to configure until you
+add a second repo.
 
 > **Running more than one repo? Read [`docs/control-plane.md`](docs/control-plane.md) first.**
 > It is the guide to operating this workspace as a control plane: the on-disk layout, the

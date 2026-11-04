@@ -5,15 +5,25 @@
 # fresh workspace could never merge its first PR from a Claude Code session. This job is
 # the honest fix: one small, real check (never a rubber stamp), and the seed the adopter
 # grows their own floor from.
+#
+# Drafts are skipped and a new push cancels the superseded run (OPERATING-MODEL.md: iterate on a
+# draft, prove it locally, mark ready, CI confirms once). No `paths-ignore` here on purpose — this
+# workspace IS the documentation repo and every check below reads markdown; the code-repo template
+# that ignores docs paths is `templates/ci.yml`.
 name: workspace-floor
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
   workspace-floor:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0

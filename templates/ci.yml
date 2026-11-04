@@ -1,0 +1,70 @@
+# CI template for a CODE repository governed from this workspace — copy to
+# `.github/workflows/ci.yml` in the code repo and replace the `run:` lines with the repo's own
+# commands. The shape is the point (OPERATING-MODEL.md, "The loop"):
+#
+#   * CI runs on pull requests that are READY FOR REVIEW, never on drafts. Iterate on a draft,
+#     prove `Done means` locally (foundry-test.sh), then mark the PR ready — CI confirms once.
+#   * A new push cancels the superseded run for the same branch (`concurrency`).
+#   * Documentation-only changes do not run the pipeline. Docs live in the workspace repo; a
+#     docs-only PR to a code repo is a defect (branch-discipline rule 7). NOTE: GitHub leaves a
+#     path-filtered required check in the "Expected" state, so such a PR is blocked from merging
+#     by design — put the words in the workspace repo instead.
+#   * DEPLOY ON PROMOTE, NOT ON MERGE. A merge to `main` is integration. The image build and the
+#     GitOps write-back run only when the operator promotes: EITHER push a `v*` tag, OR add the
+#     `deploy/staging` label to a merged PR. Both triggers are wired below; keep one or both.
+#
+# Actions are pinned to a 40-character commit SHA, never a floating tag (standing-versions rule).
+name: ci
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "specs/**"
+      - "status-reports/**"
+  push:
+    tags:
+      - "v*"                      # promote: a release tag builds and deploys
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    # Skip drafts. `github.event.pull_request` is empty on a tag push, which also evaluates false.
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: The repository's own test command (what foundry-test.sh ran locally)
+        run: |
+          set -euo pipefail
+          # Replace with the repo's real command — Taskfile `task ci`, `make test`, `npm test`,
+          # `pytest` — the same one `foundry-test.sh` runs before the push.
+          echo "replace me: run the repository's CI command here" && exit 1
+
+  deploy:
+    # Promote-gated: a `v*` tag, or the `deploy/staging` label on a pull request. Never on a
+    # plain merge to `main`. Either trigger alone is enough; delete the one you do not use.
+    needs: test
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy/staging'))
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Build the image and write the new digest back to the GitOps repo
+        run: |
+          set -euo pipefail
+          # Replace with the repo's real build + write-back. Tag the image with the git SHA (and
+          # the `v*` tag when present); never `:latest`.
+          echo "replace me: build image, push by digest, update the GitOps manifest" && exit 1

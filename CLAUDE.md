@@ -30,9 +30,12 @@ architecture sign-off, enforcement-grade anti-patterns). Read the line per invoc
 
 ### The both-modes floor (never relaxed by mode)
 
-1. **Front-authorization** — an un-authorized spec never reaches `main` (no skip).
+1. **One artifact per change** — a ticket with a runnable `Done means`; its assignment is the
+   authorization (`OPERATING-MODEL.md`). A spec is opt-in, chosen by the operator for
+   `security: true` work or a design too large for one ticket — never chosen by the agent.
 2. **The merge floor** — the platform's own enforcement (branch protection + required CI
-   checks), honestly tiered; certification against the running release before acceptance.
+   checks); deploy on promote, not on merge; the operator's own walkthrough before a release
+   is called delivered.
 3. **Security review** on auth / PII / payments / secrets / external-API surfaces.
 4. **Typed contracts** at boundaries; **git discipline** (no force-push to `main`, PR-then-merge).
 
@@ -62,22 +65,17 @@ worker is redirected into the hosted repo's working tree; its merge floor is tha
 
 ## Conventions
 
-- **Specs** are atomic: `specs/features/<product>/<domain>/<capability>/feat-<…>.md`, each
-  with stable AC-IDs + a delimited `<!-- normative -->` region (so the spec hash excludes
-  cosmetic edits) + a sibling `acceptance-contract.yaml`. Templates ship with the foundry plugin
-  (its `context/` kit — the canonical source; see `context/README.md`), not the workspace.
-- **Citation grammar** — the `[Doc:]`/`[Atom:]` forms; the grammar ships in the foundry plugin's kit.
-- **Releases** — `.foundry/releases/<id>/release.yaml` is the authoritative manifest (that exact
-  path is where the factory resolves it — `<id>` is an `[a-z0-9-]+` slug); lifecycle views under
-  `specs/lifecycle/` are generated, never hand-edited.
-- **Git discipline** — one worktree/branch per atom (`atom/<id>`, cut from the release's
-  `release/<version>` integration branch, never from `main` directly); the atom's PR targets the
-  release branch, not `main`; `main` receives **one PR per release** (a hotfix is the one
-  exception: `hotfix/<id>` → `main` directly, stated in the PR body); delete a branch only after
-  `origin` contains the merge, never before, using `scripts/foundry-worktree-gc.py --dry-run`
-  then `--apply` for the sweep. Full discipline (with the "why": one deploy trigger per release,
-  not one per atom): the plugin's `context/branch-discipline.md` and
-  `docs/how-to/branching-and-cleanup.md`.
+- **The unit of work is a ticket** — `What / Why / Done means (a command) / Paper allowed`;
+  the template and the loop are in `OPERATING-MODEL.md`. Nothing outside `Paper allowed` is
+  written for a ticket.
+- **Opt-in specs** (operator-chosen only) are atomic:
+  `specs/features/<product>/<domain>/<capability>/feat-<…>.md` with stable AC-IDs. Templates ship
+  with the foundry plugin (its `context/` kit — the canonical source; see `context/README.md`).
+- **Git discipline** — one ticket, one branch, one PR, cut from `main`; local-green
+  (`foundry-test.sh`) before the first push; draft until `Done means` passes; deploy on promote
+  (tag or label), not on merge; delete a branch only after `origin/main` contains the merge, never
+  before (`scripts/foundry-worktree-gc.py --dry-run` then `--apply`). Canonical source, enforced by
+  the git-discipline hook: the plugin's `context/branch-discipline.md`.
 
 ## Implementation-merge autonomy (per-session)
 
