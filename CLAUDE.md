@@ -30,8 +30,9 @@ architecture sign-off, enforcement-grade anti-patterns). Read the line per invoc
 
 ### The both-modes floor (never relaxed by mode)
 
-1. **The working agreement** — planning, ownership, states and acceptance are defined once, in
-   [`OPERATING-MODEL.md`](OPERATING-MODEL.md); this file does not restate them.
+1. **One artifact per change** — a ticket with a runnable `Done means`; its assignment is the
+   authorization (`OPERATING-MODEL.md`). A spec is opt-in, chosen by the operator for
+   `security: true` work or a design too large for one ticket — never chosen by the agent.
 2. **The merge floor** — the platform's own enforcement (branch protection + required CI
    checks); deploy on promote, not on merge; the operator's own walkthrough before a release
    is called delivered.
@@ -64,12 +65,13 @@ worker is redirected into the hosted repo's working tree; its merge floor is tha
 
 ## Conventions
 
-- **The working agreement** — states, ownership, eligibility, completion meanings, requests and
-  metrics conventions are in [`OPERATING-MODEL.md`](OPERATING-MODEL.md).
+- **The unit of work is a ticket** — `What / Why / Done means (a command) / Paper allowed`;
+  the template and the loop are in `OPERATING-MODEL.md`. Nothing outside `Paper allowed` is
+  written for a ticket.
 - **Opt-in specs** (operator-chosen only) are atomic:
   `specs/features/<product>/<domain>/<capability>/feat-<…>.md` with stable AC-IDs. Templates ship
   with the foundry plugin (its `context/` kit — the canonical source; see `context/README.md`).
-- **Git discipline** — one task, one branch, one PR, cut from `main`; local-green
+- **Git discipline** — one ticket, one branch, one PR, cut from `main`; local-green
   (`foundry-test.sh`) before the first push; draft until `Done means` passes; deploy on promote
   (tag or label), not on merge; delete a branch only after `origin/main` contains the merge, never
   before (`scripts/foundry-worktree-gc.py --dry-run` then `--apply`). Canonical source, enforced by

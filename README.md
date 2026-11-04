@@ -21,10 +21,12 @@ siblings — see [Layout](#layout--one-workspace-n-repos).
 
 ## The operating model — one page
 
-> **GitHub owns the plan; the platform is the gate.**
+> **One artifact per change: a ticket with a runnable "Done means". The platform is the gate.**
 
-The whole working agreement is [**`OPERATING-MODEL.md`**](OPERATING-MODEL.md); this README does not
-restate it.
+The whole model is [**`OPERATING-MODEL.md`**](OPERATING-MODEL.md): the ticket template, the loop
+(branch → build → local-green → one draft PR → merge on green → deploy on promote → close with
+the check's output), the floor that never relaxes, what is deliberately absent, and when a spec is
+still used (operator-chosen: `security: true`, or a design too large for one ticket).
 
 - **This repo (the workspace)** holds the governance: the operator registry, the repo manifest,
   the CI template, and the opt-in specs when the operator asks for one.
@@ -39,7 +41,7 @@ Full plugin model: the plugin's [`docs/architecture.md`](https://github.com/luka
 **Acme Links is the demo, not your project.** It is a small link shortener (accounts, a database,
 a dashboard) built from an empty repo to a live-proven merge, so the loop is shown rather than
 asserted. It exercises the **opt-in spec lane** end to end (the app has auth, so the operator chose
-specs); your day-to-day changes follow `OPERATING-MODEL.md` instead. The gate
+specs); your day-to-day changes take the ticket lane in `OPERATING-MODEL.md` instead. The gate
 blocks a deliberately broken seam along the way, which is what makes `status ≠ functional` visceral.
 
 Two ways in — do it, or read what happened:
@@ -97,7 +99,7 @@ both when you no longer need them. What is *yours* is described in
 rules step 0 declared. Declaring is not granting; accepting the dialog is what grants them.
 
 2. **Register operators:** edit `.claude/foundry-operators.json` (replace `op_example`; the
-   `github` field maps a GitHub login to an operator id; see `OPERATING-MODEL.md`).
+   standing authorization recorded there is what makes ticket assignment the authorization).
 3. **Apply branch protection** on each code repo's `main` (required checks on, no force-push) and
    copy [`templates/ci.yml`](templates/ci.yml) into it — see `/foundry:init` and the plugin's
    `docs/merge-floor.md`.
@@ -105,9 +107,13 @@ rules step 0 declared. Declaring is not granting; accepting the dialog is what g
 
 ## The loop
 
-The delivery loop (branch, local-green, one draft PR, merge on green, deploy on promote) and the
-meaning of each state are in `OPERATING-MODEL.md`. One gate (branch protection + CI), one operator
-walkthrough per release. The one-page model: [`OPERATING-MODEL.md`](OPERATING-MODEL.md); where things live: [`WORKFLOW.md`](WORKFLOW.md).
+```
+ticket → branch → build → local-green → one draft PR → ready when Done means passes
+      → one review pass → merge on green → deploy on promote → close with the Done-means output
+```
+
+One gate (branch protection + CI), one check (`Done means`), one operator walkthrough per release.
+The one-page model: [`OPERATING-MODEL.md`](OPERATING-MODEL.md); where things live: [`WORKFLOW.md`](WORKFLOW.md).
 
 ## Layout — one workspace, N repos
 
@@ -122,7 +128,7 @@ repo with its own history, PRs, CI and merge floor. The factory dispatches work 
 ├── CLAUDE.md                                governance loaded into every session
 ├── .claude/
 │   ├── settings.json                        the wiring (enabledPlugins → the factory)
-│   ├── foundry-operators.json               the operators and their GitHub logins
+│   ├── foundry-operators.json               the operators and their standing authorization
 │   └── foundry-project.json   ◀── THE MANIFEST. repos{} maps a dispatch key → a path below.
 ├── templates/ci.yml                         the CI template each code repo copies
 ├── specs/features/<product>/…               opt-in specs (operator-chosen; security or large design)
@@ -144,7 +150,7 @@ Three git repositories, one directory tree. The boundaries are the point:
   entries, so the control plane cannot accidentally commit your app.
 - **Each hosted repo keeps a fully independent history.** No submodule pointer, no entangled
   histories, no `git submodule update`.
-- **The record of a change is its closed issue** (with its acceptance evidence) and the merged
+- **The record of a change is its closed ticket** (with the `Done means` output) and the merged
   PR in the code repo — traceability without a file to keep in sync.
 - **The factory is not in this tree.** The plugin installs under `~/.claude/plugins/…`; upgrading
   it touches nothing above.
