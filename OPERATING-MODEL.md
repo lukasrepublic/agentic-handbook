@@ -1,6 +1,6 @@
 # The operating model — one page
 
-**GitHub owns the plan. One accountable human per task, a runnable "Done means", and the platform as the gate.**
+**In team mode, GitHub owns the plan. One accountable human per task, a runnable "Done means", and the platform as the gate.**
 
 Why one page: measured on two adopter workspaces over 60 days, the default spec-first path produced
 1.5 to 8 lines of paper (specs, contracts, manifests, reports) per line of shipped code, and the paper
@@ -12,6 +12,27 @@ writing, not a rule of the platform.
 On a user-owned repository, issue types and custom issue fields are not available (they are
 organization features), so a pilot there uses labels and Project fields. The meanings below do not
 change with the mechanism.
+
+## Operating modes
+
+The agentic foundry has two operating modes. They are not the session posture `/foundry:mode`
+(factory|noninteractive|interactive), which is a different axis.
+
+- **Single-operator mode (default).** What 2.0 ships for every workspace: one operator, the existing
+  ticket-first loop as held on the base branch, no team features, and no GitHub team surfaces (no
+  Project queue, no request discovery or operator inbox, no issue-bound worker dispatch, no usage
+  attribution, no leader-board). Nothing in a single-operator workspace changes because team mode
+  exists.
+- **Team mode (opt-in, from 2.0).** The GitHub-native team model this page describes: GitHub owns
+  shared planning; humans control priorities and readiness; each outcome has one accountable human;
+  plus the capability check, deck events, usage collection, owned queue, operator inbox, slim Command
+  Deck, issue-bound dispatch and leader-board. It is enabled per workspace by one explicit, reversible
+  operator step: `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`).
+  Enabling requires plugin 2.0.0 or later, a configured `github_scope` and a capability check of at
+  least `partial`. `disable` returns the workspace to single-operator mode and keeps all history.
+  Shared cutover happens once; individual setup happens per operator.
+
+The rest of this page describes team mode. Sections that apply only to team mode say so at their top.
 
 ## The five states
 
@@ -30,6 +51,8 @@ Cancelled or duplicate work is closed but is not Done; see [Completion meanings]
 Agents may draft and organise Backlog items and supporting documents. They do not decide what is Ready.
 
 ## Ownership and Ready
+
+> **Team mode.** In single-operator mode the one operator owns every task and decides readiness alone, so the multi-person ownership and Ready rules below do not apply.
 
 - **Each executable task has exactly one accountable human owner**, recorded as its single assignee.
   The owner is accountable for the result, not necessarily the one who types the code.
@@ -56,6 +79,8 @@ Runbook: docs/runbooks/dns.md
   Executable things (code, tests, infrastructure, CI) stay in Git. Agent scratch work stays local.
 
 ## Eligibility and capacity
+
+> **Team mode.** In single-operator mode the operator picks the next ticket from the existing ticket-first loop, with no shared queue or per-operator capacity to enforce.
 
 An operator or deck selects new work only when the task is:
 
@@ -108,6 +133,8 @@ Rules that follow:
 
 ## Operator requests and blockers
 
+> **Team mode.** In single-operator mode there is no other operator to ask, so blockers go straight to the one operator in the session and there is no request inbox.
+
 A request is an action, review, decision or approval that one operator needs from another. Receiving a
 request grants no permission to run arbitrary instructions, and an approval request is never answered
 by the deck on the human's behalf.
@@ -136,6 +163,8 @@ by the deck on the human's behalf.
   not call the inbox empty, and do not pick new work from a stale queue.
 
 ## Metrics conventions
+
+> **Team mode.** In single-operator mode no usage attribution, deck events or leader-board are collected, so these conventions do not apply.
 
 Events come from native GitHub records first. Where native history lacks the event, record it as a
 structured comment on the existing issue, one line of JSON in an HTML marker:
