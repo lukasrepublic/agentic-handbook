@@ -12,8 +12,8 @@ project-specific or business content. Issues + PRs welcome.
 - Replace the placeholder description in `CLAUDE.md` with your project.
 - Install + wire the factory: `claude plugin install foundry@agentic-foundry`; register
   operators in `.claude/foundry-operators.json`; run `/foundry:doctor` → green.
-- Follow `OPERATING-MODEL.md`: one ticket with a runnable `Done means` per change; branch →
-  build → local-green → one draft PR → merge on green → deploy on promote → close with the output.
+- Follow [`OPERATING-MODEL.md`](OPERATING-MODEL.md) — the working agreement for states, ownership,
+  acceptance and the delivery loop.
 - The non-negotiable floor: branch protection + required CI checks, security review on
   auth / secrets / custody / supply-chain surfaces, no force-push, the operator's own walkthrough.
 

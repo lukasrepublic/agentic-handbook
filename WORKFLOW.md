@@ -1,9 +1,9 @@
 # WORKFLOW — how work moves through this workspace
 
-**The default path is one page: [`OPERATING-MODEL.md`](OPERATING-MODEL.md).** One artifact per
-change — a ticket with a runnable `Done means` — and the platform (branch protection + required
-CI checks) is the gate. Read that page first; this file is the map of where things live and
-what the opt-in spec lane adds when the operator chooses it.
+**The working agreement is one page: [`OPERATING-MODEL.md`](OPERATING-MODEL.md).** GitHub owns
+planning, and the platform (branch protection + required CI checks) is the gate. Read that page
+first; this file is the map of where things live and what the opt-in spec lane adds when the
+operator chooses it.
 
 ## The default loop (ticket lane)
 
@@ -15,8 +15,7 @@ what the opt-in spec lane adds when the operator chooses it.
    → close the ticket with the Done-means output
 ```
 
-Assignment of the ticket is the authorization. Nothing else is authored for the change unless the
-ticket's `Paper allowed` names it.
+States, ownership and what counts as done are defined in `OPERATING-MODEL.md` only.
 
 ## The opt-in spec lane
 
@@ -55,7 +54,7 @@ not go through a code repo's pipeline.
 | the weekly metrics line | stdout of `foundry-delivery-metrics.py` — paper:code, PRs merged, lead time; not a report |
 | an opt-in spec | `specs/features/<product>/<domain>/<capability>/feat-*.md` |
 | architecture / ADRs | `docs/architecture/` |
-| the operator registry (standing authorization) | `.claude/foundry-operators.json` |
+| the operator registry (login ↔ operator id) | `.claude/foundry-operators.json` |
 | the repo manifest (multi-repo) | `.claude/foundry-project.json` `repos{}` — see [`docs/control-plane.md`](docs/control-plane.md) |
 
 ## Single-repo vs multi-repo
@@ -67,5 +66,4 @@ not go through a code repo's pipeline.
 
 ## Unsure what to do next?
 
-Read [`OPERATING-MODEL.md`](OPERATING-MODEL.md). If the ticket has a runnable `Done means`, build
-until it passes. If it does not, the next step is writing one — not a document about the change.
+Read [`OPERATING-MODEL.md`](OPERATING-MODEL.md).
