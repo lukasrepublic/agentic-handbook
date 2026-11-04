@@ -1,5 +1,7 @@
 # Work with Foundry each day
 
+> **Prerequisite: team mode.** The Project queue, operator inbox and requests below apply only in team mode. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`; pending: lands with gn-17). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
+
 The daily cycle for one operator: refine and mark Ready, start work, service blockers, verify, get
 review and acceptance, deliver, stop and hand off. Two worked examples follow: a code task and a
 document task, each taken to Done.

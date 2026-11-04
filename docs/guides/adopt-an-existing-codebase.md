@@ -1,5 +1,7 @@
 # Adopt an existing codebase
 
+> **Prerequisite: team mode.** This guide uses the shared GitHub Project and team surfaces. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`; pending: lands with gn-17). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
+
 Bring a repository that has never used Foundry under the shared operating model while keeping what
 it already has: its CI, branch protections, docs, architecture and work in flight. You do not extract
 or authorize a specification for every capability before your first change.

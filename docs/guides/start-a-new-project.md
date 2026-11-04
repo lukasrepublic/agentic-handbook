@@ -1,5 +1,7 @@
 # Start a new project
 
+> **Prerequisite: team mode.** The shared GitHub setup and Project queue below apply only in team mode. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`; pending: lands with gn-17). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
+
 From an empty folder to your first accepted task. The meanings of the five states, ownership and
 acceptance are defined once in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md); the shared
 GitHub setup is in [`../github-planning-surface.md`](../github-planning-surface.md). This guide

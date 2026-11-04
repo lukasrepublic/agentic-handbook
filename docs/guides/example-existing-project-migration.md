@@ -1,5 +1,7 @@
 # Example: migrating one active item of an existing project
 
+> **Prerequisite: team mode.** The shared Project and GitHub issue migration below apply only in team mode. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`; pending: lands with gn-17). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
+
 A worked walk-through of [upgrade-and-migrate.md](upgrade-and-migrate.md) for one in-flight item.
 The project, names and numbers are invented. The five per-item steps are those of the migration
 procedure; the migration commands themselves are pending: lands with gn-14, so each step shows the
@@ -12,7 +14,8 @@ evidence: a draft branch `rate-limit` and a passing unit test run).
 ## Starting conditions
 
 - The mechanical update has been applied and `/foundry:post-upgrade` has finished; installation is
-  done and adoption is pending.
+  done and adoption is pending. The workspace is in single-operator mode, the 2.0 default.
+- Team mode has been enabled as the separate step below (it is not part of the upgrade).
 - The shared Project exists and the planning repository is `acme/handbook`.
 
 ## Actor and permissions
@@ -21,6 +24,19 @@ evidence: a draft branch `rate-limit` and a passing unit test run).
 - **Item owner (Sam)**: confirms the item's facts. Sam's own `gh` login is used for anything Sam owns.
 
 ## Steps
+
+### Before step 0: enable team mode (explicit, separate from the upgrade)
+
+The 2.0 upgrade lands the workspace in single-operator mode. Team mode is a deliberate second step
+by the Project adoption owner, taken only after the upgrade and `/foundry:post-upgrade` are done:
+
+```bash
+/foundry:team-mode enable   # pending: lands with gn-17
+```
+
+It requires plugin 2.0.0 or later, a configured `github_scope` and a capability check of at least
+`partial`. It is reversible (pending: lands with gn-17): `/foundry:team-mode disable` returns to single-operator mode and keeps
+all history. Shared cutover happens once; each operator then does their own setup.
 
 ### 0. Inventory: custom rules, active obligations, retained history
 
