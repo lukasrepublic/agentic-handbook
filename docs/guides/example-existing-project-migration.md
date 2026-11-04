@@ -4,8 +4,8 @@
 
 A worked walk-through of [upgrade-and-migrate.md](upgrade-and-migrate.md) for one in-flight item.
 The project, names and numbers are invented. The five per-item steps are those of the migration
-procedure; the migration commands themselves are pending: lands with gn-14, so each step shows the
-manual equivalent that works today.
+procedure; each step shows the migration command (`scripts/foundry_migrate.py`) and, where useful, the plain
+git equivalent.
 
 The item: an old planning record `specs/features/api/rate-limit/feat-rate-limit.md` (owner Sam,
 priority high, depends on the gateway change, promised outcome "public API is rate limited",
@@ -41,7 +41,7 @@ all history. Shared cutover happens once; each operator then does their own setu
 ### 0. Inventory: custom rules, active obligations, retained history
 
 ```bash
-scripts/foundry_migrate.py inventory   # pending: lands with gn-14
+scripts/foundry_migrate.py inventory   # read-only
 git ls-files specs .foundry status-reports | wc -l
 ```
 
@@ -95,7 +95,7 @@ outcome, blocker and next action are. Disagreement means the issue is not yet co
 ### Cutover
 
 ```bash
-scripts/foundry_migrate.py cutover   # pending: lands with gn-14
+scripts/foundry_migrate.py cutover   # team mode only; --dry-run first, then --apply
 ```
 
 Until the command ships, the adoption owner records the decision as a comment on the planning

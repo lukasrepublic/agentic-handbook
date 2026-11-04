@@ -78,8 +78,9 @@ Two roles, which may be one person on a solo project:
 
    Edit `.claude/foundry-operators.json` so your GitHub login maps to your operator id, and commit it.
 
-6. **Native capability check** (inbox coverage, Project access, repository protections): the
-   command is pending: lands with gn-03. Until it ships, confirm by hand that `gh project list --owner <owner>`
+6. **Native capability check** (inbox coverage, Project access, repository protections): run
+   `scripts/foundry_github_capabilities.py` (read-only; also an advisory row in `/foundry:doctor`). To confirm by hand,
+   check that `gh project list --owner <owner>`
    shows the shared Project and that `gh issue list --assignee @me` runs without an access error.
 
 7. **Establish the working agreement and the first minimal collection**: keep

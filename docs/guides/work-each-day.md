@@ -36,10 +36,10 @@ Checked against the foundry base tree `origin/atom/subtract`; the release pin is
    ```
 
 2. **Resume before starting.** Finish In progress and Review follow-up first; pick new work only from
-   your own, unblocked, Ready tasks. Until the owned-queue verbs ship you select by reading the list above.
-   The owned-queue verbs `scripts/foundry-ticket.py next` (then `claim`, `reconcile`, `lead`) are pending: lands with gn-08.
+   your own, unblocked, Ready tasks. The owned-queue verbs select for you: `scripts/foundry-ticket.py next` shows your next item,
+   then `claim`, `reconcile` and `lead` (`acquire|renew|release|check`).
 
-3. **Start the Command Deck** to run workers and inspect requests. `/foundry:command-deck` is pending: lands with gn-10.
+3. **Start the Command Deck** to run workers and inspect requests. Use `/foundry:command-deck start|status|stop|tick`.
    Without it, use the manual path in
    [diagnose-and-recover.md](diagnose-and-recover.md#operate-manually-without-command-deck).
 
@@ -117,7 +117,7 @@ Accepted by @sam: docs/runbooks/restore.md, steps rehearsed once.
 - Acceptance of each outcome, by the named human.
 - Any expedited exception to the capacity limit, approved visibly.
 - Release sign-off, a practice and not a machine check.
-- Reading the leader-board (`/foundry:leader-board`) is pending: lands with gn-15.
+- Reading the leader-board (`/foundry:leader-board`), a read-only report.
 
 ## If it fails
 

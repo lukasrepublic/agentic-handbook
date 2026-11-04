@@ -40,10 +40,10 @@ base tree `origin/atom/subtract`. Supported source and target release numbers ar
    instructions (workspace `CLAUDE.md`, hooks, permission rules) and the items still in flight:
 
    ```bash
-   scripts/foundry_migrate.py inventory   # pending: lands with gn-14
+   scripts/foundry_migrate.py inventory   # read-only
    ```
 
-   Until that ships, do it by hand: `git ls-files specs .foundry status-reports`, plus your open
+   The same list by hand: `git ls-files specs .foundry status-reports`, plus your open
    issues and branches. Retained history keeps its bytes; do not rewrite it to fit a new shape.
 
 3. **Apply the supported mechanical update:**
@@ -75,8 +75,8 @@ base tree `origin/atom/subtract`. Supported source and target release numbers ar
    then record the authority cutover as a deliberate decision.
 
    ```bash
-   scripts/foundry_migrate.py preview   # pending: lands with gn-14
-   scripts/foundry_migrate.py cutover   # pending: lands with gn-14
+   scripts/foundry_migrate.py preview   # read-only
+   scripts/foundry_migrate.py cutover   # team mode only; --dry-run first, then --apply
    ```
 
 7. **Verify and rerun.** Run the update again: it should change nothing and create no duplicate

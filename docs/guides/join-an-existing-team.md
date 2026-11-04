@@ -76,9 +76,10 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
    gh issue list --label request --assignee @me
    ```
 
-   The inbox-coverage check and the usage-collection check are pending: lands with gn-09 and
-   pending: lands with gn-05 respectively. Until they ship, the three commands above are the check
-   that you can read your own queue and your own requests.
+   For the native checks, run `scripts/foundry_github_capabilities.py` (which request sources your
+   credentials cover), `scripts/foundry_inbox.py check` (inbox coverage) and
+   `scripts/foundry_usage.py coverage` (usage collection). The three commands above confirm that you
+   can read your own queue and your own requests.
 
 7. **Take one owned task.** Ask the planning owner to assign you a Ready task, then follow
    [work-each-day.md](work-each-day.md).

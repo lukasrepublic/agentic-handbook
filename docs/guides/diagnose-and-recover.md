@@ -60,7 +60,7 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
 
    Then identify, per active item, whether its issue exists and whether the old record is marked
    migrated. Items already moved stay in GitHub; unmigrated items stay marked as such. The partial
-   state report of the migration command is pending: lands with gn-14 (`scripts/foundry_migrate.py preview`).
+   state report is `scripts/foundry_migrate.py preview` (read-only).
 
 4. **Rollback limits.** The upgrade never rewrites retained history, and the migration records a
    decision in GitHub. You can stop, pin a plugin scope back by hand, or leave items unmigrated; you cannot
@@ -68,7 +68,7 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
 
 ### Operate manually without Command Deck
 
-Until the deck is available (`/foundry:command-deck` is pending: lands with gn-10), run the shared
+If you are not running the deck (`/foundry:command-deck start|status|stop|tick`), run the shared
 workflow with GitHub and existing commands. Everything below is visible to colleagues.
 
 1. **Queue.** Your owned, Ready, unblocked work:
