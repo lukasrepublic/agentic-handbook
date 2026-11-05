@@ -38,6 +38,15 @@ architecture sign-off, enforcement-grade anti-patterns). Read the line per invoc
 3. **Security review** on auth / PII / payments / secrets / external-API surfaces.
 4. **Typed contracts** at boundaries; **git discipline** (no force-push to `main`, PR-then-merge).
 
+## Governance
+
+The rules this workspace builds under are not written here. The policy is
+`.foundry/operating-model.yaml` (tunables and floors; absent means
+every default), the chosen blueprint and kits are pinned in `.foundry/governance.lock` (never edit it
+by hand), and this project's own rules, exceptions and baselines are in `governance/local/`. Hooks
+and CI enforce them; this file only points at them. Meaning of each part:
+[`OPERATING-MODEL.md`](OPERATING-MODEL.md#governance).
+
 ## Multi-repo control plane (hosting infra + service repos)
 
 **Full guide: [`docs/control-plane.md`](docs/control-plane.md) — read it before adding a second

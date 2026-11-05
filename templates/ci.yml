@@ -13,12 +13,24 @@
 #     GitOps write-back run only when the operator promotes: EITHER push a `v*` tag, OR add the
 #     `deploy/staging` label to a merged PR. Both triggers are wired below; keep one or both.
 #
+#   * BUDGETS ARE COMMANDS, NOT GATES. A performance or request-count budget (Lighthouse, a bundle
+#     size limit, a load-test threshold) is a command you run and report in the PR. It is not a
+#     required check: a noisy number that blocks every merge teaches people to retry and then to
+#     disable it. `foundry_ci_budget_lint.py` flags a budget job wired as required.
+#   * GOVERNANCE-TRACE ties each PR to its ticket's `## Design`. It reads policy from the PR's BASE
+#     commit (a PR cannot loosen the class that grades it), only reads the PR checkout, and runs the
+#     check from the plugin at the version in `.foundry/governance.lock`. Replace <PLUGIN_REF> with
+#     that version's 40-character commit, and add `governance-trace` to the required checks. The
+#     governance kit ships the same job: `governance/kits/delivery/checks/governance-trace.yml.template`
+#     in the plugin. The `paths-ignore` filter below also skips this job, so if you make it required, move
+#     it to its own workflow without a path filter, or a docs-only PR waits on it forever.
+#
 # Actions are pinned to a 40-character commit SHA, never a floating tag (standing-versions rule).
 name: ci
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
     paths-ignore:
       - "**.md"
       - "docs/**"
@@ -36,12 +48,62 @@ permissions:
   contents: read
 
 jobs:
+  governance-trace:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+    steps:
+      - name: Check out the base commit (policy, boundaries, operators)
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      - name: Check out the PR merge commit (read only)
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          path: pr
+          persist-credentials: false
+      - name: Check out the plugin at the locked version
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          repository: lukasrepublic/agentic-foundry
+          ref: <PLUGIN_REF>
+          path: plugin
+          persist-credentials: false
+      - name: Read the PR, its paged file list and its ticket
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh pr view "$PR" --repo "$REPO" --json number,body > pr.json
+          gh api --paginate "repos/${REPO}/pulls/${PR}/files" --jq '.[] | ({path: .filename}, (if .previous_filename then {path: .previous_filename} else empty end))' | jq -s . > files.json
+          REF="$(python3 plugin/governance/kits/delivery/checks/governance-trace.py ticket-ref --pr-json pr.json)"
+          N="${REF##*#}"
+          R="${REF%#*}"
+          gh issue view "$N" --repo "${R:-$REPO}" --json number,body,labels,author > ticket.json
+      - name: governance-trace
+        env:
+          CLAUDE_PLUGIN_ROOT: ${{ github.workspace }}/plugin
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+        run: >-
+          python3 plugin/governance/kits/delivery/checks/governance-trace.py check
+          --pr-json pr.json --files-json files.json --ticket-json ticket.json --repo "$REPO" --agent-login "$ACTOR"
+          --project-dir pr --base-dir base
+
   test:
     # Skip drafts. `github.event.pull_request` is empty on a tag push, which also evaluates false.
-    if: github.event.pull_request.draft == false
+    # An `edited` event (title or body change) re-runs only governance-trace, never the tests.
+    if: github.event.pull_request.draft == false && github.event.action != 'edited'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: The repository's own test command (what foundry-test.sh ran locally)
         run: |
           set -euo pipefail
@@ -61,7 +123,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Build the image and write the new digest back to the GitOps repo
         run: |
           set -euo pipefail

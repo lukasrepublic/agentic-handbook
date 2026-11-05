@@ -1,14 +1,13 @@
 # Work with Foundry each day
 
-> **Prerequisite: team mode.** The Project queue, operator inbox and requests below apply only in team mode. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
-
 The daily cycle for one operator: refine and mark Ready, start work, service blockers, verify, get
 review and acceptance, deliver, stop and hand off. Two worked examples follow: a code task and a
 document task, each taken to Done.
 
 The states, eligibility, completion meanings and request rules are defined in
 [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md); this guide only shows how to act on them.
-Checked against the foundry base tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
+Checked against foundry `release/2.0.0` at `7681b90a`. One operating mode: a solo developer works this
+way as a team of one.
 
 ## Starting conditions
 
@@ -37,7 +36,8 @@ Checked against the foundry base tree `origin/atom/subtract`; the release pin is
 
 2. **Resume before starting.** Finish In progress and Review follow-up first; pick new work only from
    your own, unblocked, Ready tasks. The owned-queue verbs select for you: `scripts/foundry-ticket.py next` shows your next item,
-   then `claim`, `reconcile` and `lead` (`acquire|renew|release|check`).
+   then `claim` (a lease that expires without a heartbeat; `claims.expires_after`, default 2h),
+   `reconcile` (also the heartbeat) and `lead` (`acquire|renew|release|check`).
 
 3. **Start the Command Deck** to run workers and inspect requests. Use `/foundry:command-deck start|status|stop|tick`.
    Without it, use the manual path in
@@ -47,25 +47,75 @@ Checked against the foundry base tree `origin/atom/subtract`; the release pin is
    before routine work. A non-blocker gets a visible target date, and a reschedule keeps the original
    target.
 
-5. **Start a task**, set its Status to In progress, then:
+5. **Write the Design before the build.** The ticket carries `## Design` (components, what it reuses,
+   the rule ids it cites), `## Security` (rule ids, or `none:` and why) and `## Surfaces` (one line per
+   surface, or `n/a:` and why). On an architecture or security path, a declared trust boundary or a
+   `size:L` ticket, `start` refuses without a Design that cites an existing rule id (`design-required`).
+   Find the ids with `foundry_governance.py applicable --paths <path> ...`.
+
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" applicable --paths src/auth/login.py
+   ```
+
+   Editing a CI path (workflows, CI scripts, test configs) is the operator's call per ticket:
+   `foundry-ticket.py ci-allow <path>`. A performance or request-count budget is a command you run and
+   report, not a required check.
+
+6. **Start a task**, set its Status to In progress, then:
 
    ```bash
    python3 "$CLAUDE_PLUGIN_ROOT/scripts/foundry-ticket.py" start <issue-number>
    python3 "$CLAUDE_PLUGIN_ROOT/scripts/foundry-ticket.py" status
    ```
 
-6. **Verify locally** before the first push:
+7. **Verify locally** before the first push:
 
    ```bash
    bash "$CLAUDE_PLUGIN_ROOT/scripts/foundry-test.sh"
    python3 "$CLAUDE_PLUGIN_ROOT/scripts/foundry-ticket.py" done
    ```
 
-7. **Open one PR, seek review, deliver.** One review pass by someone other than the author, then merge
+8. **Open one PR, seek review, deliver.** One review pass by someone other than the author, then merge
    on green (`/foundry:merge-when-green <pr-number>` only on your explicit say-so). Deploy on promote.
 
-8. **Stop and hand off.** Leave a handoff comment on each unfinished issue naming the branch or PR,
+9. **Stop and hand off.** Leave a handoff comment on each unfinished issue naming the branch or PR,
    the evidence and the next action.
+
+### The deck's report, STALL and pause
+
+Each Command Deck tick ends with one four-block report: a first line (local date and time, how much is
+done), then **Your decisions**, **Building now**, **Needs you** and **Ledger**. It is short on purpose
+(`report.max_lines`, default 8) and names the coordination channel "the shared message log". A tick that
+merged nothing and verified nothing prints `STALL:` and the reason; read that line first. The renderer
+and the pause switch are `scripts/foundry_deck_report.py` (pending: lands with gv-13):
+
+```text
+pause   foundry_deck_report.py pause --until "<what must happen>" --reason "<why>"   (pending: lands with gv-13)
+resume  foundry_deck_report.py resume                                              (pending: lands with gv-13)
+state   foundry_deck_report.py state                                               (pending: lands with gv-13)
+```
+
+A paused deck starts no new fan-out until you resume it. Pause states what you are waiting for.
+
+### Before and after every production change
+
+A change to a live environment is stated first and reported after, in the shared message log. The
+wrapper `scripts/foundry_prod_step.py` (pending: lands with gv-13) posts `PROD-BEFORE`, runs your command
+after `--`, then posts `PROD-AFTER`, or runs your cleanup and posts `STOP` on failure. If the before
+line cannot be posted, the command does not run. Approve each call; never persist an "always allow" for it.
+Check the log for unpaired lines with `foundry_message_log.py audit`.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_message_log.py" audit
+```
+
+### Command shape in a session
+
+Hooks refuse the shapes the permission layer cannot read ahead of time: no `cd` (use
+`git -C <absolute-dir>` and absolute paths), `rm` only inside the session scratch directory, no packed
+`bash -c` scripts or code heredocs (write the script to a file and run it by name), and no command that
+reads a secret value. There is no off switch. The hooks are `hooks/foundry-shell-shape.py` and
+`hooks/foundry-secret-read-guard.py`.
 
 ### Example A: a code task taken to Done
 
@@ -74,6 +124,12 @@ Issue #42 "Rate-limit the public API", owner `you`, Work type `code`:
 ```markdown
 ## What
 Rate-limit the public API.
+## Design
+Components: src/api/middleware/**. Reuses: the existing token-bucket helper. Cites: <rule id>
+## Security
+none: no new credential or trust boundary
+## Surfaces
+api: new 429 response
 ## Done means
 npx playwright test tests/rate-limit.spec.ts
 ```
@@ -87,21 +143,21 @@ npx playwright test tests/rate-limit.spec.ts
 
 ### Example B: a document task accepted by its named owner
 
-Issue #57 "Runbook: restore the database", Work type `document`, accepting owner `sam`. There is no
+Issue #57 "Runbook: restore the database", Work type `document`, accepting owner `owner-b`. There is no
 Done-means command, and none is invented:
 
 ```markdown
 ## What
 Write the restore runbook.
 ## Acceptance criteria
-Accepted by @sam: docs/runbooks/restore.md, steps rehearsed once.
+Accepted by @owner-b: docs/runbooks/restore.md, steps rehearsed once.
 ```
 
 1. Ready, then In progress. You draft `docs/runbooks/restore.md` on a branch and open one PR.
 2. You link the PR and the rehearsal evidence and set Status to Review. Worker verification is
    complete; acceptance is pending and the issue stays open.
-3. Sam, the named accepting owner, reads the revision in the PR and states acceptance on the issue.
-4. After the merge, the issue is closed `completed` with Sam's acceptance and the merged revision
+3. `owner-b`, the named accepting owner, reads the revision in the PR and states acceptance on the issue.
+4. After the merge, the issue is closed `completed` with the owner's acceptance and the merged revision
    linked. Status is Done. The accepting person's decision, not a command, made it Done.
 
 ## Expected results

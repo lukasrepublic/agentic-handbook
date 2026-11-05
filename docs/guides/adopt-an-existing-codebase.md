@@ -1,14 +1,12 @@
 # Adopt an existing codebase
 
-> **Prerequisite: team mode.** This guide uses the shared GitHub Project and team surfaces. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
-
 Bring a repository that has never used Foundry under the shared operating model while keeping what
 it already has: its CI, branch protections, docs, architecture and work in flight. You do not extract
 or authorize a specification for every capability before your first change.
 
 Definitions live in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md) and
-[`../github-planning-surface.md`](../github-planning-surface.md). Checked against the foundry base
-tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
+[`../github-planning-surface.md`](../github-planning-surface.md). Checked against foundry
+`release/2.0.0` at `7681b90a`. There is one operating mode; a solo developer is a team of one.
 
 ## Starting conditions
 
@@ -63,15 +61,45 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
    /foundry:doctor
    ```
 
+   `/foundry:init` writes `github_scope` (a required part of setup, solo developers included).
+
 4. **Declare the code repository**: clone it into the workspace as a gitignored sibling, add its
    `repos{}` entry, and keep its own CI and protections as the merge floor
    ([step 4 of the control plane guide](../control-plane.md#step-4--bring-in-your-first-code-repo)).
 
-5. **Create the shared Project and labels** by hand ([planning surface](../github-planning-surface.md)).
+5. **Put governance on the codebase, by pull request.** Intake reads the tree, ranks the blueprints and
+   asks you to confirm. Nothing is guessed, and nothing is regenerated over your files. Details:
+   the plugin's `docs/how-to/governance-intake-and-upgrade.md`.
+
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" discover --summary
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" select
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" select --confirm <blueprint-id>
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" declare --asvs-level <level> --trust-boundary 'src/auth/**'
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" apply --pr
+   ```
+
+   `select` stops with exit code 3 until you confirm. `apply --pr` writes `.foundry/governance.lock`,
+   scaffolds `governance/local/`, installs the kits' CI and hook snippets, and opens one pull request.
+   An existing workflow or hook of yours is kept, not overwritten.
+
+6. **Baseline what already fails**, so only new violations block. Run each kit check, save its
+   findings to a file, then freeze them:
+
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" baseline --check <name> --findings <file>
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" check
+   ```
+
+   Anything you accept for longer goes in `governance/local/exceptions.yaml` with an owner and an
+   expiry. A floor rule cannot be baselined away or excepted.
+
+7. **Create the shared Project and labels** by hand ([planning surface](../github-planning-surface.md)).
    Move existing issues in only as you touch them; do not bulk-import the backlog.
 
-6. **Do one real change using existing knowledge.** Write a task whose Context links the existing
-   docs and ADRs, with a Done-means command from the repository's own test suite:
+8. **Do one real change using existing knowledge.** Write a task whose Context links the existing
+   docs and ADRs, with a Done-means command from the repository's own test suite, and `## Design`, `## Security` and
+   `## Surfaces` sections:
 
    ```bash
    python3 "$CLAUDE_PLUGIN_ROOT/scripts/foundry-ticket.py" start <issue-number>
@@ -94,6 +122,7 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
 
 ## Outstanding human decisions
 
+- The blueprint, the ASVS level and the trust boundaries (declared by you, never inferred).
 - Which open issues become tasks, and who owns each.
 - Whether any existing branch protection should change (never done by this procedure).
 - Which existing documents are the current source for each topic; see

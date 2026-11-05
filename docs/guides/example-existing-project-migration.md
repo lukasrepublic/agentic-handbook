@@ -1,42 +1,34 @@
 # Example: migrating one active item of an existing project
 
-> **Prerequisite: team mode.** The shared Project and GitHub issue migration below apply only in team mode. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
-
 A worked walk-through of [upgrade-and-migrate.md](upgrade-and-migrate.md) for one in-flight item.
 The project, names and numbers are invented. The five per-item steps are those of the migration
 procedure; each step shows the migration command (`scripts/foundry_migrate.py`) and, where useful, the plain
 git equivalent.
 
-The item: an old planning record `specs/features/api/rate-limit/feat-rate-limit.md` (owner Sam,
+The item: an old planning record `specs/features/api/rate-limit/feat-rate-limit.md` (owner `owner-b`,
 priority high, depends on the gateway change, promised outcome "public API is rate limited",
 evidence: a draft branch `rate-limit` and a passing unit test run).
 
 ## Starting conditions
 
 - The mechanical update has been applied and `/foundry:post-upgrade` has finished; installation is
-  done and adoption is pending. The workspace is in single-operator mode, the 2.0 default.
-- Team mode has been enabled as the separate step below (it is not part of the upgrade).
+  done and adoption is pending. The workspace has one operating mode, as every 2.0 workspace does.
+- `github_scope` is configured (the step below).
 - The shared Project exists and the planning repository is `acme/handbook`.
 
 ## Actor and permissions
 
-- **Project adoption owner (Lukas)**: runs the migration and records the cutover.
-- **Item owner (Sam)**: confirms the item's facts. Sam's own `gh` login is used for anything Sam owns.
+- **Project adoption owner **: runs the migration and records the cutover.
+- **Item owner (`owner-b`)**: confirms the item's facts. Their own `gh` login is used for anything they own.
 
 ## Steps
 
-### Before step 0: enable team mode (explicit, separate from the upgrade)
+### Before step 0: check `github_scope`
 
-The 2.0 upgrade lands the workspace in single-operator mode. Team mode is a deliberate second step
-by the Project adoption owner, taken only after the upgrade and `/foundry:post-upgrade` are done:
-
-```bash
-/foundry:team-mode enable
-```
-
-It requires plugin 2.0.0 or later, a configured `github_scope` and a capability check of at least
-`partial`. It is reversible: `/foundry:team-mode disable` returns to single-operator mode and keeps
-all history. Shared cutover happens once; each operator then does their own setup.
+There is one operating mode, so there is no switch to turn on. Check that `/foundry:init` has written
+`github_scope` into `.claude/foundry-project.json`; the migration verbs refuse with
+`github-scope-missing` until it is there. The upgrade re-runs governance intake as a separate pull
+request ([upgrade-and-migrate.md](upgrade-and-migrate.md)); finish it before you migrate items.
 
 ### 0. Inventory: custom rules, active obligations, retained history
 
@@ -61,8 +53,8 @@ git ls-files specs/features .foundry/releases | xargs sha256sum > "$TMPDIR/histo
 
 ### 1. Identify owner, priority, dependencies, outcome, evidence
 
-From the old record: owner Sam, priority high, blocked by the gateway change, outcome "public API is
-rate limited", evidence branch `rate-limit` and its test run. Sam confirms each in a comment.
+From the old record: owner `owner-b`, priority high, blocked by the gateway change, outcome "public API is
+rate limited", evidence branch `rate-limit` and its test run. The item owner confirms each in a comment.
 
 ### 2. Create the issue and link its knowledge, branch and PR
 
@@ -89,13 +81,13 @@ specs, release records) receives no such edit.
 
 ### 5. Confirm owner and a second engineer both understand it from GitHub
 
-Sam and a colleague each open the issue with no other context and state, in a comment, what the
+The item owner and a colleague each open the issue with no other context and state, in a comment, what the
 outcome, blocker and next action are. Disagreement means the issue is not yet complete.
 
 ### Cutover
 
 ```bash
-scripts/foundry_migrate.py cutover   # team mode only; --dry-run first, then --apply
+scripts/foundry_migrate.py cutover   # --dry-run first, then --apply
 ```
 
 Until the command ships, the adoption owner records the decision as a comment on the planning
