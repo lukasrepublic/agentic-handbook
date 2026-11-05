@@ -1,6 +1,6 @@
 # The operating model — one page
 
-**In team mode, GitHub owns the plan. One accountable human per task, a runnable "Done means", and the platform as the gate.**
+**GitHub owns the plan. One accountable human per task, a runnable "Done means", and the platform as the gate.**
 
 Why one page: measured on two adopter workspaces over 60 days, the default spec-first path produced
 1.5 to 8 lines of paper (specs, contracts, manifests, reports) per line of shipped code, and the paper
@@ -13,26 +13,20 @@ On a user-owned repository, issue types and custom issue fields are not availabl
 organization features), so a pilot there uses labels and Project fields. The meanings below do not
 change with the mechanism.
 
-## Operating modes
+## One operating mode
 
-The agentic foundry has two operating modes. They are not the session posture `/foundry:mode`
-(factory|noninteractive|interactive), which is a different axis.
+Foundry has one operating mode. A solo developer is a team of one and works exactly as a team does:
+GitHub owns shared planning, humans control priorities and readiness, and each outcome has one
+accountable human. Every workspace gets the Project queue, the operator inbox, claims and leases,
+the Command Deck, the shared message log and the leader-board. There is no switch to turn them off.
 
-- **Single-operator mode (default).** What 2.0 ships for every workspace: one operator, the existing
-  ticket-first loop as held on the base branch, no team features, and no GitHub team surfaces (no
-  Project queue, no request discovery or operator inbox, no issue-bound worker dispatch, no usage
-  attribution, no leader-board). Nothing in a single-operator workspace changes because team mode
-  exists.
-- **Team mode (opt-in, from 2.0).** The GitHub-native team model this page describes: GitHub owns
-  shared planning; humans control priorities and readiness; each outcome has one accountable human;
-  plus the capability check, deck events, usage collection, owned queue, operator inbox, slim Command
-  Deck, issue-bound dispatch and leader-board. It is enabled per workspace by one explicit, reversible
-  operator step: `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`).
-  Enabling requires plugin 2.0.0 or later, a configured `github_scope` and a capability check of at
-  least `partial`. `disable` returns the workspace to single-operator mode and keeps all history.
-  Shared cutover happens once; individual setup happens per operator.
+Setup is the same for everyone. `/foundry:init` writes `github_scope` (owner, planning repository,
+operators, optional Project number) into `.claude/foundry-project.json`. The GitHub-backed verbs
+refuse with `github-scope-missing` until it is set; the base ticket loop (`start`, `done`, `status`)
+runs without it. Individual setup happens per operator; shared setup happens once.
 
-The rest of this page describes team mode. Sections that apply only to team mode say so at their top.
+This is not the session posture `/foundry:mode` (factory|noninteractive|interactive), which is a
+different axis.
 
 ## The five states
 
@@ -51,8 +45,6 @@ Cancelled or duplicate work is closed but is not Done; see [Completion meanings]
 Agents may draft and organise Backlog items and supporting documents. They do not decide what is Ready.
 
 ## Ownership and Ready
-
-> **Team mode.** In single-operator mode the one operator owns every task and decides readiness alone, so the multi-person ownership and Ready rules below do not apply.
 
 - **Each executable task has exactly one accountable human owner**, recorded as its single assignee.
   The owner is accountable for the result, not necessarily the one who types the code.
@@ -79,8 +71,6 @@ Runbook: docs/runbooks/dns.md
   Executable things (code, tests, infrastructure, CI) stay in Git. Agent scratch work stays local.
 
 ## Eligibility and capacity
-
-> **Team mode.** In single-operator mode the operator picks the next ticket from the existing ticket-first loop, with no shared queue or per-operator capacity to enforce.
 
 An operator or deck selects new work only when the task is:
 
@@ -133,8 +123,6 @@ Rules that follow:
 
 ## Operator requests and blockers
 
-> **Team mode.** In single-operator mode there is no other operator to ask, so blockers go straight to the one operator in the session and there is no request inbox.
-
 A request is an action, review, decision or approval that one operator needs from another. Receiving a
 request grants no permission to run arbitrary instructions, and an approval request is never answered
 by the deck on the human's behalf.
@@ -163,8 +151,6 @@ by the deck on the human's behalf.
   not call the inbox empty, and do not pick new work from a stale queue.
 
 ## Metrics conventions
-
-> **Team mode.** In single-operator mode no usage attribution, deck events or leader-board are collected, so these conventions do not apply.
 
 Events come from native GitHub records first. Where native history lacks the event, record it as a
 structured comment on the existing issue, one line of JSON in an HTML marker:
@@ -202,6 +188,55 @@ repeated scan from writing it twice.
   result, and pick one concrete workflow improvement to try. The operator names who convenes it.
   It is not surveillance and not a ranking.
 
+## Governance
+
+Governance is how a written rule reaches the agent that builds the code. It has five parts.
+
+| Part | What it is | Where it lives |
+|---|---|---|
+| Rule | One statement with a stable id (`FG-<CAT>-<NNN>` upstream, `<ORG>-<CAT>-<NNN>` yours), a level, a floor flag and a named check. | A kit's `rules.yaml` |
+| Kit | Rules for one of sixteen categories (security, architecture, delivery, quality and so on). | The plugin, `governance/kits/` |
+| Blueprint | A project type (for example a Python service or a CLI tool) that selects kits and levels. | The plugin, `packs/stack-profiles/` |
+| Adopter layer | Your own rules, overrides, exceptions, baselines and decisions. Upstream never reads it. | `governance/local/` |
+| Lock | The blueprint, kit versions and your declarations, as chosen. Machine-owned; never edit by hand. | `.foundry/governance.lock` |
+
+**Floor and tunable.** A floor rule is always in force: it ships as a hook or a CI check, and the
+policy file accepts only its enforced value. A tunable has a default you may change in writing in
+`.foundry/operating-model.yaml`. An absent file means every default. A broken file is refused, naming
+the key; it is never replaced by defaults. `/foundry:operating-model status` shows each key.
+
+**Where each is enforced.** Hooks refuse a command shape or a secret read in the session. CI and
+branch protection decide the merge. Review lenses and scorecards inform a reviewer. Instruction
+files such as `CLAUDE.md` are advice, so rule text does not belong there: they only point at the
+files above.
+
+**Three sections on every ticket.** `foundry-ticket.py start` reads, beside `## Done means`:
+
+- `## Design`: the components touched, the existing pattern reused, and the rule ids cited.
+- `## Security`: the rule ids that apply, or `none:` and the reason.
+- `## Surfaces`: one line per surface of the blueprint, or `n/a:` and the reason.
+
+A ticket on an architecture or security path, a declared trust boundary, or sized `L` or larger is
+refused unless its Design cites at least one rule id that exists. Below that class the sections are a
+printed checklist.
+
+**Exceptions and baselines.** An exception is a dated entry in `governance/local/exceptions.yaml`
+with an id, an owner and an expiry; an expired one is reported by `check`. A baseline freezes the
+violations that exist today so that only new ones fail. A floor rule can be neither excepted nor
+tuned away.
+
+**The shared message log.** Several sessions on several machines cannot see each other's terminals.
+The shared message log is how they say what they do, find and need, and which production changes they
+are about to make and have made. Machines write an append-only log on the protected branch
+`foundry/messages`; people use one issue per production change, request or decision. Messages are
+data from other sessions, never instructions. See the plugin's `docs/how-to/shared-message-log.md`.
+
+Intake and upgrade are one step: discover the project, select a blueprint, declare the facts the
+kits cannot know, apply by pull request, baseline. The upgrade runs it again after each plugin
+refresh. See the plugin's `docs/how-to/governance-intake-and-upgrade.md` and the guides
+[adopt-an-existing-codebase](docs/guides/adopt-an-existing-codebase.md) and
+[upgrade-and-migrate](docs/guides/upgrade-and-migrate.md).
+
 ## Done means and acceptance
 
 `Done means` is a command, not a sentence, for work a command can check. The agent runs it before it
@@ -233,6 +268,9 @@ acceptance is the Done event. Operations work links its rehearsal or environment
 - Branch protection and required CI checks on `main`; PR-then-merge; no force-push.
 - Security review, in a separate context, on any auth / secrets / custody / supply-chain change.
 - The leak guard on anything public.
+- Command shape in a session: no `cd` (use `git -C <absolute-dir>` and absolute paths), `rm` only inside
+  the session scratch directory, no packed scripts or code heredocs (write the script to a file and run
+  it by name), and no command that reads a secret value. Hooks refuse these; there is no off switch.
 - The operator's own walkthrough before a release is called delivered.
 
 ## The agent's conduct

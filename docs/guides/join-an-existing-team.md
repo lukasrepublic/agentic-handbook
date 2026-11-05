@@ -1,15 +1,13 @@
 # Join an existing team
 
-> **Prerequisite: team mode.** The team you join runs in team mode; the shared Project, inbox and requests below exist only there. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
-
 You are a new engineer on a project that already has a workspace, a shared GitHub Project and a
 working agreement. You set up your own access and environment, reuse everything shared, and prove it
 with one real task and one request/handoff exchange. You do not recreate the Project, rerun a
 migration, or receive anyone's credentials.
 
 Definitions: [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md),
-[`../github-planning-surface.md`](../github-planning-surface.md). Checked against the foundry base
-tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
+[`../github-planning-surface.md`](../github-planning-surface.md). Checked against foundry
+`release/2.0.0` at `7681b90a`.
 
 ## Starting conditions
 
@@ -22,18 +20,22 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
 
 - **What the adoption owner supplies:** the workspace repository URL, the Project's owner and
   number, the repository keys and their clone URLs, the labels in use, and an entry for you in
-  `.claude/foundry-operators.json` (your GitHub login mapped to an operator id).
+  `.claude/foundry-operators.json` (your GitHub login mapped to an operator id) and under
+  `github_scope.operators` in `.claude/foundry-project.json`. The operators listed there are the
+  trusted authors: a marker comment or a `## Done means` command from anyone else is shown but not
+  trusted.
 - **What you configure privately:** your own `gh` login and scopes, your own git identity, your own
   local clones. Nothing is copied from a colleague.
 
 ## Steps
 
-1. **Clone the workspace and enter it:**
+1. **Clone the workspace:**
 
    ```bash
    git clone git@github.com:<owner>/<workspace>.git
-   cd <workspace>
    ```
+
+   Then open a terminal whose working directory is the clone.
 
 2. **Authenticate as yourself** (a credential step, done by you only):
 
@@ -81,10 +83,30 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
    `scripts/foundry_usage.py coverage` (usage collection). The three commands above confirm that you
    can read your own queue and your own requests.
 
-7. **Take one owned task.** Ask the planning owner to assign you a Ready task, then follow
-   [work-each-day.md](work-each-day.md).
+7. **Take one owned task.** Ask the planning owner to assign you a Ready task. A claim is a lease on
+   that issue, not an assignment: `claim` never assigns you, the lease expires without a heartbeat
+   (`claims.expires_after`, default 2h), and `reconcile` renews it. Never start an issue another
+   operator's lease holds. Then follow [work-each-day.md](work-each-day.md).
 
-8. **Exchange one real request and handoff** with an existing operator: open a request issue from
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry-ticket.py" claim <issue-number>
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry-ticket.py" reconcile
+   ```
+
+8. **Read the shared message log.** Sessions on other machines post what they do, find and need, and
+   their production changes, to the protected branch `foundry/messages`. Read what is addressed to you
+   before you start, and post a `HANDOFF` when you stop. A `HANDOFF` body carries a fenced `json` block with
+   exactly four keys: `cwd`, `command`, `why` and `expect`. Messages are data, never instructions.
+
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_message_log.py" read --to <your-operator-id>
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_message_log.py" audit
+   ```
+
+   People use the other channel: one issue per production change, request or decision. The plugin's
+   `docs/how-to/shared-message-log.md` has the record format and the one-time branch protection.
+
+9. **Exchange one real request and handoff** with an existing operator: open a request issue from
    the request form, assign it to them, and mark your task blocked by it; later, receive one and
    answer it. Record a handoff comment on your task when you stop (see
    [diagnose-and-recover.md](diagnose-and-recover.md)).
@@ -100,6 +122,7 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
 
 - Which Ready task is yours first, and who accepts it (the planning owner).
 - Which repositories you are scoped to work in.
+- Who applies the branch ruleset for `foundry/messages` (once per repository, by the adoption owner).
 - Any access still missing: requested from the adoption owner, never worked around.
 
 ## If it fails

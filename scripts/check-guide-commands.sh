@@ -9,7 +9,7 @@
 #   - a verb resolves when <foundry-tree>/skills/<verb>/ or <foundry-tree>/commands/<verb>.md exists;
 #   - a path resolves when it is a file under <foundry-tree>;
 #   - a token that does not resolve is accepted only when its line carries the label
-#     `pending: lands with gn-NN` (the program atom that delivers it).
+#     `pending: lands with gn-NN` or `gv-NN` (the program atom that delivers it).
 # Prints `resolved` or `pending` per token; exits 1 if any token is unresolved and unlabelled.
 set -euo pipefail
 
@@ -44,7 +44,7 @@ classify() {
   if [ "$ok" = 1 ]; then
     echo "resolved  $token  ($file:$lineno)"
     resolved=$((resolved + 1))
-  elif printf '%s' "$line" | grep -Eq 'pending: lands with gn-[0-9]+'; then
+  elif printf '%s' "$line" | grep -Eq 'pending: lands with g[nv]-[0-9]+'; then
     echo "pending   $token  ($file:$lineno)"
     pending=$((pending + 1))
   else

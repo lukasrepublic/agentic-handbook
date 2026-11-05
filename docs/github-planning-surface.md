@@ -1,10 +1,8 @@
 # The GitHub planning surface
 
-> **Team mode only.** This page is a prerequisite for team mode, not for the default single-operator
-> mode. Enable team mode first with `/foundry:team-mode enable` (script
-> `scripts/foundry_operating_mode.py enable-team`); see "Operating modes" in
-> [`../OPERATING-MODEL.md`](../OPERATING-MODEL.md). The issue and PR templates below stay as they are
-> and are harmless in single-operator mode.
+> **One mode.** Every workspace uses this surface, a solo developer included (a team of one). There is
+> no switch to enable first; `github_scope` is part of setup (`/foundry:init`). See "One operating mode"
+> in [`../OPERATING-MODEL.md`](../OPERATING-MODEL.md).
 
 Where the team plans and coordinates: one shared GitHub Project, two issue forms, a PR template and a
 few labels. The meanings (states, ownership, completion, requests) are defined once in
@@ -98,18 +96,27 @@ The `target repo key` on a task is a key of `repos{}` in
 [`control-plane.md`](control-plane.md) §3 for adding one. That mapping decides which local checkout a
 task is worked in. A task whose key does not resolve is not eligible for dispatch.
 
-## Proposal: a `github_scope` block
+## The `github_scope` block
 
-A workspace may eventually name its planning surface in `.claude/foundry-project.json`. This is a
-proposal; nothing reads it yet and it is not in the shipped file.
+`/foundry:init` writes this block into `.claude/foundry-project.json`. It is required: the GitHub-backed
+verbs (`foundry-ticket.py next|claim|reconcile|lead`, the inbox, the deck, the leader-board, usage)
+refuse with `github-scope-missing` until it is present.
 
 ```jsonc
 "github_scope": {
   "owner": "acme",                 // user or organization that owns the Project
   "planning_repo": "acme-handbook",
-  "project_number": 1,             // the shared Project
-  "operators": { "alice-login": "op_alice", "bob-login": "op_bob" }  // GitHub login -> operator id
+  "project_number": 1,             // optional: the shared Project
+  "operators": { "alice-login": {}, "bob-login": {} }  // the trusted GitHub logins
 }
 ```
 
-The `operators` map mirrors the `github` field already in `.claude/foundry-operators.json`.
+`operators` lists every login whose marker comments and `## Done means` commands are trusted; anyone
+else's are shown but never authoritative. It mirrors the `github` field already in
+`.claude/foundry-operators.json`.
+
+## The message log branch
+
+Machines coordinate through the protected branch `foundry/messages`, people through one issue per
+production change or request. Apply the branch ruleset once per repository; steps are in the plugin's
+`docs/how-to/shared-message-log.md`.

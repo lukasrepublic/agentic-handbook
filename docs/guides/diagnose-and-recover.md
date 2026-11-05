@@ -1,14 +1,12 @@
 # Diagnose and recover
 
-> **Prerequisite: team mode.** The inbox, Project and Command Deck checks below apply only to a team-mode workspace. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
-
 What to check, and what to do next, when something is off: the wrong workspace or version, stale
 instructions, missing GitHub access, a partial inbox, duplicate leads, an interrupted migration,
 uncommitted work, or no Command Deck. It ends with a manual way to run the shared workflow using
 GitHub and existing commands only.
 
-Definitions: [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md). Checked against the foundry base
-tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
+Definitions: [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md). Checked against foundry
+`release/2.0.0` at `7681b90a`.
 
 ## Starting conditions
 
@@ -30,8 +28,10 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
    /foundry:doctor
    ```
 
+   For governance state, `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" check` reports the
+   drift and the expired exceptions without changing anything.
+
    ```bash
-   pwd
    git rev-parse --show-toplevel
    git status --short
    ```
@@ -42,12 +42,17 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
 
    | Symptom | Check | Next action |
    |---|---|---|
-   | Wrong workspace or version | `pwd`; `claude plugin list`; compare with a colleague's version in the planning repo | Restart at the workspace root; update your own scope; open a new session |
+   | Wrong workspace or version | `git rev-parse --show-toplevel`; `claude plugin list`; compare with a colleague's version in the planning repo | Restart at the workspace root; update your own scope; open a new session |
    | Preserved stale instructions | `git log -3 -- CLAUDE.md .claude/` and the upgrade report `.foundry/upgrade-report.json` | Reconcile against [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md); record the choice in a PR |
    | Missing GitHub access | `gh auth status`; `gh project list --owner <owner>` | Run `gh auth refresh -s read:project -s project` yourself; ask the owner for membership |
    | Partial inbox (a source unreadable) | `gh issue list --assignee @me`; `gh pr list --search "review-requested:@me"` | Report which source failed; do not call the inbox empty and pick no new routine work |
    | Duplicate leads | `gh issue list --label request --state open` and compare owners | The adoption owner names one; the others stop and comment |
    | Interrupted migration | `git status`; list issues carrying a predecessor link | Finish or mark items; see the next section |
+   | Governance drift (a kit or blueprint behind the plugin, a lock from another plugin version, a hand-edited rendered file) | `foundry_governance.py check` (read-only) | Open the upgrade pull request: `foundry_governance.py upgrade --pr`; never edit `.foundry/governance.lock` by hand |
+   | Expired exception | `foundry_governance.py exceptions` | Renew it in `governance/local/exceptions.yaml` with a new owner decision, or fix the cause and delete it |
+   | Lost claim (the lease expired or another session took it) | `foundry-ticket.py reconcile`; `foundry-ticket.py lead check` | Re-`claim` only if no one else holds it; otherwise stop and comment. Work is on its branch; nothing is lost |
+   | Unpaired production line | `foundry_message_log.py audit` | Anyone may close a pair with a `STOP` that gives the reason; the sender finishes or reverts the change |
+   | A command was refused by a hook | read the refusal; it names the allowed shape | Use `git -C`, a scratch path or a script file; do not look for a bypass |
    | Uncommitted work | `git status --short`; `git stash list` | Commit to a branch and push after `foundry-test.sh`; never discard |
 
 3. **Interrupted upgrade or migration.** Do not restart from scratch. Re-run the updater (it is
@@ -68,7 +73,7 @@ tree `origin/atom/subtract`; the release pin is pending: lands with gn-06.
 
 ### Operate manually without Command Deck
 
-If you are not running the deck (`/foundry:command-deck start|status|stop|tick`), run the shared
+If a deck is paused or not running (`/foundry:command-deck start|status|stop|tick`; pause and resume are in [work-each-day.md](work-each-day.md#the-decks-report-stall-and-pause)), run the shared
 workflow with GitHub and existing commands. Everything below is visible to colleagues.
 
 1. **Queue.** Your owned, Ready, unblocked work:

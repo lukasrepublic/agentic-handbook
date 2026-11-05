@@ -66,11 +66,10 @@ history entirely its own, and the manifest is a file you already have.
 **Open Claude Code in the control-plane directory. Not in `api/`. Not in `infra/`. Ever.**
 
 ```bash
-cd ~/work/acme-handbook     # ✅ the control plane — the factory is live here
-claude
-
-cd ~/work/acme-handbook/api # ❌ a hosted repo — you get a plain session with no factory
-claude
+# ✅ a terminal whose working directory is ~/work/acme-handbook (the control plane): run claude there,
+#    and the factory is live
+# ❌ a terminal whose working directory is ~/work/acme-handbook/api (a hosted repo): you get a plain
+#    session with no factory
 ```
 
 This is not style. Claude Code resolves everything from the session's project directory
@@ -135,8 +134,8 @@ Starting from nothing. Substitute your own names throughout.
 
 ```bash
 # GitHub UI → "Use this template" on agentic-handbook → acme-handbook
-git clone git@github.com:<you>/acme-handbook.git
-cd acme-handbook
+git clone git@github.com:<you>/acme-handbook.git ~/work/acme-handbook
+# then open a terminal whose working directory is ~/work/acme-handbook
 ```
 
 Everything from here happens **in this directory**.

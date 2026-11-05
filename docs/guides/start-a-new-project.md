@@ -1,15 +1,12 @@
 # Start a new project
 
-> **Prerequisite: team mode.** The shared GitHub setup and Project queue below apply only in team mode. Enable it first with `/foundry:team-mode enable` (script `scripts/foundry_operating_mode.py enable-team`). Single-operator mode is the default and needs none of it; see "Operating modes" in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md).
-
 From an empty folder to your first accepted task. The meanings of the five states, ownership and
 acceptance are defined once in [`../../OPERATING-MODEL.md`](../../OPERATING-MODEL.md); the shared
 GitHub setup is in [`../github-planning-surface.md`](../github-planning-surface.md). This guide
 links to both and does not restate them.
 
-Checked against the foundry base tree `origin/atom/subtract`. The release pin for this guide is
-pending: lands with gn-06. Until then no version is named here; the install step takes the
-marketplace's current release.
+Checked against foundry `release/2.0.0` at `7681b90a`. There is one operating mode: a solo developer
+is a team of one and follows every step below.
 
 ## Starting conditions
 
@@ -60,13 +57,11 @@ Two roles, which may be one person on a solo project:
 4. **Install the plugin and open the session at the workspace root**:
 
    ```bash
-   cd my-workspace
    claude plugin marketplace add lukasrepublic/agentic-foundry
    claude plugin install foundry@agentic-foundry
-   claude
    ```
 
-   Always start Claude Code at the workspace root, never inside a hosted repository (see
+   Then open a terminal whose working directory is `my-workspace` and run `claude`. Always start Claude Code at the workspace root, never inside a hosted repository (see
    [the session rule](../control-plane.md#2-the-session-rule-always-start-from-the-control-plane)).
 
 5. **Wire and diagnose** inside the session:
@@ -76,19 +71,38 @@ Two roles, which may be one person on a solo project:
    /foundry:doctor
    ```
 
-   Edit `.claude/foundry-operators.json` so your GitHub login maps to your operator id, and commit it.
+   `/foundry:init` writes `github_scope` (owner, planning repository, your login under `operators`) into
+   `.claude/foundry-project.json`. It is part of setup for everyone, a solo developer included; the
+   GitHub-backed verbs refuse with `github-scope-missing` until it is set. Edit
+   `.claude/foundry-operators.json` so your GitHub login maps to your operator id, and commit both.
 
-6. **Native capability check** (inbox coverage, Project access, repository protections): run
+6. **Choose your governance** (still in the session, by pull request). Intake finds nothing in an empty
+   folder and says so; pick the blueprint closest to what you are building and declare the facts the
+   kits cannot know. The full loop is in
+   [adopt-an-existing-codebase.md](adopt-an-existing-codebase.md#steps).
+
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" select
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" select --confirm <blueprint-id>
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" declare --asvs-level <level>
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_governance.py" apply --pr
+   ```
+
+   Review and merge that pull request. It writes `.foundry/governance.lock` and the `governance/local/`
+   layer. `select` always stops for your choice and never picks for you.
+
+7. **Native capability check** (inbox coverage, Project access, repository protections): run
    `scripts/foundry_github_capabilities.py` (read-only; also an advisory row in `/foundry:doctor`). To confirm by hand,
    check that `gh project list --owner <owner>`
    shows the shared Project and that `gh issue list --assignee @me` runs without an access error.
 
-7. **Establish the working agreement and the first minimal collection**: keep
+8. **Establish the working agreement and the first minimal collection**: keep
    [`OPERATING-MODEL.md`](../../OPERATING-MODEL.md) as it is or edit it in writing, then add one
    hosted code repository by the steps in [the control plane guide](../control-plane.md#3-setting-up-a-multi-repo-project-step-by-step).
 
-8. **Run one owned task to Done.** Create a task from the issue form, set yourself as owner and
-   mark it Ready on the Project. Then:
+9. **Run one owned task to Done.** Create a task from the issue form (with `## Design`,
+   `## Security` and `## Surfaces` sections; see [OPERATING-MODEL.md](../../OPERATING-MODEL.md#governance)),
+   set yourself as owner and mark it Ready on the Project. Then:
 
    ```bash
    python3 "$CLAUDE_PLUGIN_ROOT/scripts/foundry-ticket.py" start <issue-number>
@@ -107,6 +121,7 @@ Two roles, which may be one person on a solo project:
 - `my-workspace/` exists with `.claude/settings.json`, the operator registry and the managed files;
   re-running the wizard later reports drift and never overwrites an edited file.
 - `/foundry:doctor` reports `DOCTOR-GREEN`.
+- `.foundry/governance.lock` and `governance/local/` exist on `main`, merged by pull request.
 - Everyone who works on the project sees the same Project, with one Status field of five values.
 - Your first task moves Backlog, Ready, In progress, Review, Done on the Project, with the PR and
   the Done-means output linked as evidence. A green installation or a green doctor alone is not

@@ -28,7 +28,7 @@ To change, edit the line above to `lean` or `scale` and commit. `lean` favors th
 loop + lighter ceremony; `scale` enforces the full gates (deeper review, mandatory
 architecture sign-off, enforcement-grade anti-patterns). Read the line per invocation.
 
-### The both-modes floor (never relaxed by mode)
+### The floor (both stage modes)
 
 1. **The working agreement** — planning, ownership, states and acceptance are defined once, in
    [`OPERATING-MODEL.md`](OPERATING-MODEL.md); this file does not restate them.
@@ -37,6 +37,15 @@ architecture sign-off, enforcement-grade anti-patterns). Read the line per invoc
    is called delivered.
 3. **Security review** on auth / PII / payments / secrets / external-API surfaces.
 4. **Typed contracts** at boundaries; **git discipline** (no force-push to `main`, PR-then-merge).
+
+## Governance
+
+The rules this workspace builds under are not written here. The policy is
+`.foundry/operating-model.yaml` (tunables and floors; absent means
+every default), the chosen blueprint and kits are pinned in `.foundry/governance.lock` (never edit it
+by hand), and this project's own rules, exceptions and baselines are in `governance/local/`. Hooks
+and CI enforce them; this file only points at them. Meaning of each part:
+[`OPERATING-MODEL.md`](OPERATING-MODEL.md#governance).
 
 ## Multi-repo control plane (hosting infra + service repos)
 

@@ -15,7 +15,10 @@ operator chooses it.
    → accept and close with evidence, per Completion meanings in OPERATING-MODEL.md
 ```
 
-States, ownership and what counts as done are defined in `OPERATING-MODEL.md` only.
+States, ownership and what counts as done are defined in `OPERATING-MODEL.md` only. There is one
+operating mode: a solo developer follows the same loop as a team, as a team of one. Each ticket also
+carries `## Design`, `## Security` and `## Surfaces` sections
+([Governance](OPERATING-MODEL.md#governance)).
 
 ## The opt-in spec lane
 
@@ -50,7 +53,9 @@ not go through a code repo's pipeline.
 | the task (the unit of work) | a GitHub issue from the task form — What / Why / Owner / Target repo key / Acceptance criteria / Done means / Context |
 | the PR + its checks | the code repo; one PR per ticket, draft until local-green |
 | the record of done | the issue closed as `completed` with the accepting actor and evidence linked (Completion meanings in `OPERATING-MODEL.md`); a passing Done-means run is verification, not acceptance |
-| the CI template for a code repo | [`templates/ci.yml`](templates/ci.yml) (skips drafts, cancels superseded runs, deploys on promote) |
+| the governance (policy, lock, your own rules, exceptions, baselines) | `.foundry/operating-model.yaml`, `.foundry/governance.lock`, `governance/local/` — meaning in [Governance](OPERATING-MODEL.md#governance); how to set up in [`docs/guides/adopt-an-existing-codebase.md`](docs/guides/adopt-an-existing-codebase.md) |
+| the shared message log (what sessions do, find and need; production changes) | the branch `foundry/messages` and one issue per topic — see [`docs/guides/join-an-existing-team.md`](docs/guides/join-an-existing-team.md) |
+| the CI template for a code repo | [`templates/ci.yml`](templates/ci.yml) (skips drafts, cancels superseded runs, deploys on promote) and [`templates/governance-trace.yml`](templates/governance-trace.yml) (ties each PR to its ticket's Design) |
 | the weekly metrics line | stdout of `foundry-delivery-metrics.py` — paper:code, PRs merged, lead time; not a report |
 | an opt-in spec | `specs/features/<product>/<domain>/<capability>/feat-*.md` |
 | architecture / ADRs | `docs/architecture/` |
@@ -63,6 +68,15 @@ not go through a code repo's pipeline.
 - **Multi-repo:** this workspace is the control plane; each code repo is a gitignored sibling
   declared in `.claude/foundry-project.json` `repos{}`, with its own branch protection and CI.
   Full pattern: [`docs/control-plane.md`](docs/control-plane.md).
+
+## Guides
+
+[Start a project](docs/guides/start-a-new-project.md) ·
+[adopt a codebase](docs/guides/adopt-an-existing-codebase.md) ·
+[work each day](docs/guides/work-each-day.md) ·
+[join a team](docs/guides/join-an-existing-team.md) ·
+[upgrade](docs/guides/upgrade-and-migrate.md) ·
+[diagnose and recover](docs/guides/diagnose-and-recover.md)
 
 ## Unsure what to do next?
 

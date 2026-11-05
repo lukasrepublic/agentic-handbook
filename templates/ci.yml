@@ -13,6 +13,13 @@
 #     GitOps write-back run only when the operator promotes: EITHER push a `v*` tag, OR add the
 #     `deploy/staging` label to a merged PR. Both triggers are wired below; keep one or both.
 #
+#   * BUDGETS ARE COMMANDS, NOT GATES. A performance or request-count budget (Lighthouse, a bundle
+#     size limit, a load-test threshold) is a command you run and report in the PR. It is not a
+#     required check: a noisy number that blocks every merge teaches people to retry and then to
+#     disable it. `foundry_ci_budget_lint.py` flags a budget job wired as required.
+#   * GOVERNANCE-TRACE is a separate workflow, `governance-trace.yml` beside this file, so a PR edit
+#     never cancels or re-runs this one.
+#
 # Actions are pinned to a 40-character commit SHA, never a floating tag (standing-versions rule).
 name: ci
 
@@ -41,7 +48,7 @@ jobs:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: The repository's own test command (what foundry-test.sh ran locally)
         run: |
           set -euo pipefail
@@ -61,7 +68,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Build the image and write the new digest back to the GitOps repo
         run: |
           set -euo pipefail
