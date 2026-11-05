@@ -1,6 +1,13 @@
-# Decision: governance blueprint for a documentation repository
+---
+status: accepted
+date: 2026-11-04
+confirmation:
+  check_id: FG-ARCH-005
+---
 
-**Date:** 2026-11-04 · **Charter:** gv-19-dogfood
+# 0001: Governance blueprint for a documentation repository
+
+**Status:** accepted · **Charter:** gv-19-dogfood
 
 ## Context
 
@@ -25,3 +32,16 @@ rule files are copied to `security-checks/` because the workflows reference them
 
 A purpose-built docs-only blueprint would drop the non-binding rules and the release-attestation workflow. That is a
 follow-up for the framework, not a change made here.
+
+## Notes on the rendered rules
+
+- Paths cited in `governance/rendered/*.md`, such as `governance/kits/**` and `scripts/foundry_governance.py`, resolve
+  against the foundry plugin, not this repository.
+- `cost.md` and `operations.md` are rendered even though the blueprint does not select those kits for this repository,
+  because they carry floor rules (`FG-COST-001`, `FG-OPS-004`, `FG-OPS-005`), and floor rules are never filtered out.
+- `.foundry/governance.lock` is tracked (re-included in `.gitignore`). `.foundry/governance-intake.json` is intake state
+  and stays ignored.
+
+## Confirmation
+
+`FG-ARCH-005` (the ADR lint over `docs/decisions/**`).

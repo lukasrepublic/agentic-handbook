@@ -1,11 +1,17 @@
 # Enforces FG-SEC-022. Adopters copy this kit's checks/ directory into their repo as security-checks/ and run from the repo root.
 # Registry packs (p/...) are not pinnable by commit or tag; the own rules file is versioned with the repo.
 name: sast
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+concurrency:
+  group: ci-semgrep-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
   semgrep:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
