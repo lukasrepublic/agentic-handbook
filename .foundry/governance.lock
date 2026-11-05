@@ -51,7 +51,7 @@ facts_sha256: 1df91f6396db767a3f13b4b866241f3a9fd54ca9667bbd77a1981e01bd317e55
 intake_at: '2026-11-04'
 plugin_version: 1.18.5
 snippets:
-  .github/workflows/ci-gitleaks.yml: 42aa5cee3dc3cca28e137003cc879125fdad30c1853a5366e634412887bbdfec
-  .github/workflows/ci-semgrep.yml: 1288d0a192d393b959d823bd5419e92f9b4b152e3013b83d64f030d49569cd31
-  .github/workflows/ci-release-attest.yml: 18a6a02f13427bb3d1a0d3f63f8ec0147682992c9fb953befa93709d193dca9f
-  .github/workflows/ci-scorecard.yml: af631742a298f9d5c2fd0990450217b484558ede755102714eb04549e87e8233
+  .github/workflows/ci-gitleaks.yml: 2ace7d20f9ed977bcea83004f06ed6be45847002dd642c88bbc72e321be64bd2
+  .github/workflows/ci-semgrep.yml: 28dcf1a40b2844a7a5eb6efaa665f2ca9ef41104212af24ca423172015802266
+  .github/workflows/ci-release-attest.yml: bafd4a5b97448e3ae4530545fa9698ceefb431e09ebf619ad8e26c33cb722617
+  .github/workflows/ci-scorecard.yml: fd38e1859c7743ec7abbe65ae33b89fe9b09a57ed257946892672eb5a2c3fd59
