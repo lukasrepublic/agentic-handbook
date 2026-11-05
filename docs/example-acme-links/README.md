@@ -63,10 +63,10 @@ Every step's checkpoint is a tag in the [`acme-links`](https://github.com/lukasr
 repo, so you can read the destination before walking to it:
 
 ```bash
-git clone https://github.com/lukasrepublic/acme-links && cd acme-links
-git log --oneline --graph          # one merged PR per atom, behind the floor
-git show step-5                    # the checkpoint where the stub was blocked, then fixed
-cat .foundry/build-provenance.yaml # every atom pinned to its frozen contract
+git clone https://github.com/lukasrepublic/acme-links <clone-dir>
+git -C <clone-dir> log --oneline --graph          # one merged PR per atom, behind the floor
+git -C <clone-dir> show step-5                    # the checkpoint where the stub was blocked, then fixed
+cat <clone-dir>/.foundry/build-provenance.yaml    # every atom pinned to its frozen contract
 ```
 
 The stub-then-fix in step 5 is real history, not a screenshot: the first commit on that

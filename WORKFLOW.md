@@ -55,7 +55,7 @@ not go through a code repo's pipeline.
 | the record of done | the issue closed as `completed` with the accepting actor and evidence linked (Completion meanings in `OPERATING-MODEL.md`); a passing Done-means run is verification, not acceptance |
 | the governance (policy, lock, your own rules, exceptions, baselines) | `.foundry/operating-model.yaml`, `.foundry/governance.lock`, `governance/local/` — meaning in [Governance](OPERATING-MODEL.md#governance); how to set up in [`docs/guides/adopt-an-existing-codebase.md`](docs/guides/adopt-an-existing-codebase.md) |
 | the shared message log (what sessions do, find and need; production changes) | the branch `foundry/messages` and one issue per topic — see [`docs/guides/join-an-existing-team.md`](docs/guides/join-an-existing-team.md) |
-| the CI template for a code repo | [`templates/ci.yml`](templates/ci.yml) (skips drafts, cancels superseded runs, deploys on promote) |
+| the CI template for a code repo | [`templates/ci.yml`](templates/ci.yml) (skips drafts, cancels superseded runs, deploys on promote) and [`templates/governance-trace.yml`](templates/governance-trace.yml) (ties each PR to its ticket's Design) |
 | the weekly metrics line | stdout of `foundry-delivery-metrics.py` — paper:code, PRs merged, lead time; not a report |
 | an opt-in spec | `specs/features/<product>/<domain>/<capability>/feat-*.md` |
 | architecture / ADRs | `docs/architecture/` |

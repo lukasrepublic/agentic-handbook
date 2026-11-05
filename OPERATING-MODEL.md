@@ -265,7 +265,6 @@ acceptance is the Done event. Operations work links its rehearsal or environment
 
 ## The floor (never relaxed)
 
-
 - Branch protection and required CI checks on `main`; PR-then-merge; no force-push.
 - Security review, in a separate context, on any auth / secrets / custody / supply-chain change.
 - The leak guard on anything public.

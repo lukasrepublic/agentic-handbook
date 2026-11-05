@@ -81,7 +81,8 @@ plugin). They are separate on purpose: you own your requirements, you install th
 ```bash
 # 1. Create the workspace from the template
 #    GitHub UI → "Use this template" → <project>-handbook
-git clone https://github.com/<you>/<project>-handbook && cd <project>-handbook
+git clone https://github.com/<you>/<project>-handbook <project>-handbook
+#    then open a terminal whose working directory is that clone
 
 # 2. Install the factory
 #    (the pin below is historical — install per docs/SETUP.md, which no longer names a tag)
@@ -660,13 +661,13 @@ fixed at the same time.
 **Verify it yourself** — the point of the file is that this works:
 
 ```bash
-git clone https://github.com/lukasrepublic/agentic-handbook && cd agentic-handbook
-git checkout 96bf3b256250eb8b9ff9bb9ed6f9470a1d521cfd
+git clone https://github.com/lukasrepublic/agentic-handbook <clone-dir>
+git -C <clone-dir> checkout 96bf3b256250eb8b9ff9bb9ed6f9470a1d521cfd
 python3 - <<'EOF'
 import sys; sys.path.insert(0, "<plugin>/scripts")
 import foundry_contract as fc
-print(fc.spec_sha256("specs/features/acme-links/auth/feat-handbook-acme-links-auth.md"))
-print(fc.contract_sha256("specs/features/acme-links/auth/acceptance-contract.yaml"))
+print(fc.spec_sha256("<clone-dir>/specs/features/acme-links/auth/feat-handbook-acme-links-auth.md"))
+print(fc.contract_sha256("<clone-dir>/specs/features/acme-links/auth/acceptance-contract.yaml"))
 EOF
 # must print the values recorded in build-provenance.yaml
 ```
@@ -702,12 +703,12 @@ That is the entire thesis, and it is why the checks are where they are.
 
 ```bash
 # read the destination first
-git clone https://github.com/lukasrepublic/acme-links && cd acme-links
-git log --oneline --graph          # one merged PR per atom, each behind the floor
-git show step-5                    # the stub blocked, then the fix admitted
-cat .foundry/build-provenance.yaml # every atom pinned to its frozen contract
+git clone https://github.com/lukasrepublic/acme-links <clone-dir>
+git -C <clone-dir> log --oneline --graph          # one merged PR per atom, each behind the floor
+git -C <clone-dir> show step-5                    # the stub blocked, then the fix admitted
+cat <clone-dir>/.foundry/build-provenance.yaml    # every atom pinned to its frozen contract
 
-# then walk it
+# then walk it (from a terminal whose working directory is <clone-dir>)
 make install && make db-up && make db-push
 make build && make journeys        # 36/36
 ```

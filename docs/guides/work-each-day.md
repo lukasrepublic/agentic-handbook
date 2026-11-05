@@ -105,6 +105,13 @@ after `--`, then posts `PROD-AFTER`, or runs your cleanup and posts `STOP` on fa
 line cannot be posted, the command does not run. Approve each call; never persist an "always allow" for it.
 Check the log for unpaired lines with `foundry_message_log.py audit`.
 
+```text
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_prod_step.py" --repo <path> --remote origin --what "<one line>" [--on-failure "<cleanup>"] -- <command>   (pending: lands with gv-13)
+```
+
+`--repo` and `--remote` are required: the log is written to the repository and remote you name, never to
+the current directory's origin. The command after `--` is an argument list, not a shell line.
+
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/foundry_message_log.py" audit
 ```

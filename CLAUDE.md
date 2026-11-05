@@ -28,7 +28,7 @@ To change, edit the line above to `lean` or `scale` and commit. `lean` favors th
 loop + lighter ceremony; `scale` enforces the full gates (deeper review, mandatory
 architecture sign-off, enforcement-grade anti-patterns). Read the line per invocation.
 
-### The both-modes floor (never relaxed by mode)
+### The floor (both stage modes)
 
 1. **The working agreement** — planning, ownership, states and acceptance are defined once, in
    [`OPERATING-MODEL.md`](OPERATING-MODEL.md); this file does not restate them.

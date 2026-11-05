@@ -18,7 +18,7 @@ evidence: a draft branch `rate-limit` and a passing unit test run).
 
 ## Actor and permissions
 
-- **Project adoption owner **: runs the migration and records the cutover.
+- **Project adoption owner**: runs the migration and records the cutover.
 - **Item owner (`owner-b`)**: confirms the item's facts. Their own `gh` login is used for anything they own.
 
 ## Steps
