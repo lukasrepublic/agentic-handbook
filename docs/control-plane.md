@@ -66,10 +66,11 @@ history entirely its own, and the manifest is a file you already have.
 **Open Claude Code in the control-plane directory. Not in `api/`. Not in `infra/`. Ever.**
 
 ```bash
-# ✅ a terminal whose working directory is ~/work/acme-handbook (the control plane): run claude there,
-#    and the factory is live
-# ❌ a terminal whose working directory is ~/work/acme-handbook/api (a hosted repo): you get a plain
-#    session with no factory
+cd ~/work/acme-handbook     # ✅ the control plane — the factory is live here
+claude
+
+cd ~/work/acme-handbook/api # ❌ a hosted repo — you get a plain session with no factory
+claude
 ```
 
 This is not style. Claude Code resolves everything from the session's project directory
@@ -134,8 +135,8 @@ Starting from nothing. Substitute your own names throughout.
 
 ```bash
 # GitHub UI → "Use this template" on agentic-handbook → acme-handbook
-git clone git@github.com:<you>/acme-handbook.git ~/work/acme-handbook
-# then open a terminal whose working directory is ~/work/acme-handbook
+git clone git@github.com:<you>/acme-handbook.git
+cd acme-handbook
 ```
 
 Everything from here happens **in this directory**.
@@ -164,10 +165,6 @@ claude plugin install foundry@agentic-foundry
 > cleanly the whole time they were wrong: agreeing with each other was never the same claim as
 > being current. Dropping the literal pin here removes the failure mode outright rather than
 > chasing it with a fifth catch.
-
-Each operator authenticates with their own credentials (their own `gh` login and token); never
-share or copy one between people. If a shared GitHub Project already exists for this workspace, reuse
-it rather than creating another; see [`github-planning-surface.md`](github-planning-surface.md).
 
 Edit `.claude/foundry-operators.json` — replace the example with your real id. This is
 load-bearing, not paperwork: every frozen contract names an `operator_id`, and the freeze
@@ -377,10 +374,6 @@ workspace-targeted by definition.
 **Someone joining the project** — they clone the control plane, install the plugin, add
 themselves to the operator registry, then clone each hosted repo into the paths the manifest
 already names. The manifest *is* the onboarding document.
-
-A joining operator signs in with their own credentials (never a colleague's, never copied) and reuses
-the existing shared Project rather than creating one. The scopes and views are in
-[`github-planning-surface.md`](github-planning-surface.md).
 
 **Upgrading the factory** — `claude plugin update foundry@agentic-foundry`. Your specs,
 manifest, and hosted repos are untouched; the plugin is not in your tree.

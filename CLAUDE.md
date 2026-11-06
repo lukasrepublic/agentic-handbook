@@ -28,24 +28,13 @@ To change, edit the line above to `lean` or `scale` and commit. `lean` favors th
 loop + lighter ceremony; `scale` enforces the full gates (deeper review, mandatory
 architecture sign-off, enforcement-grade anti-patterns). Read the line per invocation.
 
-### The floor (both stage modes)
+### The both-modes floor (never relaxed by mode)
 
-1. **The working agreement** — planning, ownership, states and acceptance are defined once, in
-   [`OPERATING-MODEL.md`](OPERATING-MODEL.md); this file does not restate them.
+1. **Front-authorization** — an un-authorized spec never reaches `main` (no skip).
 2. **The merge floor** — the platform's own enforcement (branch protection + required CI
-   checks); deploy on promote, not on merge; the operator's own walkthrough before a release
-   is called delivered.
+   checks), honestly tiered; certification against the running release before acceptance.
 3. **Security review** on auth / PII / payments / secrets / external-API surfaces.
 4. **Typed contracts** at boundaries; **git discipline** (no force-push to `main`, PR-then-merge).
-
-## Governance
-
-The rules this workspace builds under are not written here. The policy is
-`.foundry/operating-model.yaml` (tunables and floors; absent means
-every default), the chosen blueprint and kits are pinned in `.foundry/governance.lock` (never edit it
-by hand), and this project's own rules, exceptions and baselines are in `governance/local/`. Hooks
-and CI enforce them; this file only points at them. Meaning of each part:
-[`OPERATING-MODEL.md`](OPERATING-MODEL.md#governance).
 
 ## Multi-repo control plane (hosting infra + service repos)
 
@@ -73,16 +62,22 @@ worker is redirected into the hosted repo's working tree; its merge floor is tha
 
 ## Conventions
 
-- **The working agreement** — states, ownership, eligibility, completion meanings, requests and
-  metrics conventions are in [`OPERATING-MODEL.md`](OPERATING-MODEL.md).
-- **Opt-in specs** (operator-chosen only) are atomic:
-  `specs/features/<product>/<domain>/<capability>/feat-<…>.md` with stable AC-IDs. Templates ship
-  with the foundry plugin (its `context/` kit — the canonical source; see `context/README.md`).
-- **Git discipline** — one task, one branch, one PR, cut from `main`; local-green
-  (`foundry-test.sh`) before the first push; draft until `Done means` passes; deploy on promote
-  (tag or label), not on merge; delete a branch only after `origin/main` contains the merge, never
-  before (`scripts/foundry-worktree-gc.py --dry-run` then `--apply`). Canonical source, enforced by
-  the git-discipline hook: the plugin's `context/branch-discipline.md`.
+- **Specs** are atomic: `specs/features/<product>/<domain>/<capability>/feat-<…>.md`, each
+  with stable AC-IDs + a delimited `<!-- normative -->` region (so the spec hash excludes
+  cosmetic edits) + a sibling `acceptance-contract.yaml`. Templates ship with the foundry plugin
+  (its `context/` kit — the canonical source; see `context/README.md`), not the workspace.
+- **Citation grammar** — the `[Doc:]`/`[Atom:]` forms; the grammar ships in the foundry plugin's kit.
+- **Releases** — `.foundry/releases/<id>/release.yaml` is the authoritative manifest (that exact
+  path is where the factory resolves it — `<id>` is an `[a-z0-9-]+` slug); lifecycle views under
+  `specs/lifecycle/` are generated, never hand-edited.
+- **Git discipline** — one worktree/branch per atom (`atom/<id>`, cut from the release's
+  `release/<version>` integration branch, never from `main` directly); the atom's PR targets the
+  release branch, not `main`; `main` receives **one PR per release** (a hotfix is the one
+  exception: `hotfix/<id>` → `main` directly, stated in the PR body); delete a branch only after
+  `origin` contains the merge, never before, using `scripts/foundry-worktree-gc.py --dry-run`
+  then `--apply` for the sweep. Full discipline (with the "why": one deploy trigger per release,
+  not one per atom): the plugin's `context/branch-discipline.md` and
+  `docs/how-to/branching-and-cleanup.md`.
 
 ## Implementation-merge autonomy (per-session)
 

@@ -24,5 +24,4 @@ __pycache__/
 !/.foundry/README.md
 !/.foundry/build-provenance.yaml
 !/.foundry/stack-profile.lock
-!/.foundry/governance.lock
 # FOUNDRY-RUNTIME-GITIGNORE-END (re-run the applier to converge; do not edit by hand)

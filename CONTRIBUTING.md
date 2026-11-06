@@ -12,9 +12,8 @@ project-specific or business content. Issues + PRs welcome.
 - Replace the placeholder description in `CLAUDE.md` with your project.
 - Install + wire the factory: `claude plugin install foundry@agentic-foundry`; register
   operators in `.claude/foundry-operators.json`; run `/foundry:doctor` → green.
-- Follow [`OPERATING-MODEL.md`](OPERATING-MODEL.md) — the working agreement for states, ownership,
-  acceptance and the delivery loop.
-- The non-negotiable floor: branch protection + required CI checks, security review on
-  auth / secrets / custody / supply-chain surfaces, no force-push, the operator's own walkthrough.
+- Follow `WORKFLOW.md`: `intake → spec-review → authorize → implement → floor → certify → accept`.
+- The non-negotiable floor (set by the factory): front-authorization (no skip), the
+  the merge floor, security review on sensitive surfaces, typed contracts, git discipline.
 
 Code of Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
